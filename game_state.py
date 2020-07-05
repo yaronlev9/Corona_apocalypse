@@ -24,5 +24,6 @@ class GameState(object):
             for j in range(2):
                 print(board[i][j])
 
+
 ga = GameState()
 ga.create_board()
