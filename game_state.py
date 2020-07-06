@@ -115,6 +115,43 @@ class GameState(object):
         legal_actions.append(Action.STOP)
         return legal_actions
 
+    def apply_action(self, action, player):
+        # if action not in self.get_legal_actions(player):
+        #     raise Exception("illegal action.")
+        if player == 0:
+            old_location = self.__location
+        elif player == 1:
+            old_location = self.__corona_1_location
+        else:
+            old_location = self.__corona_2_location
+        if action == Action.UP:
+            new_location = (old_location[0]-1, old_location[1])
+            self.__board[old_location[0]][old_location[1]] = "_"
+        elif action == Action.DOWN:
+            new_location = (old_location[0]+1, old_location[1])
+            self.__board[old_location[0]][old_location[1]] = "_"
+        elif action == Action.RIGHT:
+            new_location = (old_location[0], old_location[1]+1)
+            self.__board[old_location[0]][old_location[1]] = "_"
+        elif action == Action.LEFT:
+            new_location = (old_location[0], old_location[1]-1)
+            self.__board[old_location[0]][old_location[1]] = "_"
+        else:
+            new_location = old_location
+        if player == 0:
+            self.__location = new_location
+            if self.__board[new_location[0]][new_location[1]] == 'm':
+                self.__mask = True
+            self.__board[new_location[0]][new_location[1]] = '0'
+        elif player == 1:
+            self.__corona_1_location = new_location
+            self.__board[new_location[0]][new_location[1]] = '1'
+        elif player == 2:
+            self.__corona_2_location = new_location
+            self.__board[new_location[0]][new_location[1]] = '2'
+
+        def generate_successor(self, player, action1, action2=None):
+
 
 ga = GameState()
 create_board()
