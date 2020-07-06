@@ -67,7 +67,6 @@ class GameState(object):
                 return True
             return self.__board[location[0]][location[1]] == '_' or \
                    self.__board[location[0]][location[1]] == 'm'
-        print(self.__board[6][0])
         return self.__board[location[0]][location[1]] == '_'
 
     def _is_left_legal_action(self, location, player):
@@ -172,9 +171,12 @@ class GameState(object):
         return successor
 
     def __str__(self):
-        print(self.__board)
+        for i in range(self.__height):
+            print(self.__board[i])
         return ''
 
 
 ga = GameState()
-print(ga.get_legal_actions(1))
+print(ga)
+t = ga.generate_successor(0, Action.LEFT)
+print(t)
