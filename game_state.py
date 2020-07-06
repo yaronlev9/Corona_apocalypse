@@ -1,4 +1,13 @@
 import numpy as np
+from enum import Enum
+
+
+class Action(Enum):
+    UP = "UP"
+    DOWN = "DOWN"
+    LEFT = "LEFT"
+    RIGHT = "RIGHT"
+
 
 WIDTH = 16
 HEIGHT = 16
