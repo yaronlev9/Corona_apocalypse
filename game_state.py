@@ -177,5 +177,6 @@ class GameState(object):
 
 ga = GameState()
 print(ga)
+print(ga)
 t = ga.generate_successor(0, Action.LEFT)
 print(t)
