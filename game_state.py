@@ -22,26 +22,32 @@ TARGET = 'W'
 
 
 def create_board():
-    board = np.array([['_______________' + '0'], ['---_' + '-' * 12],
-                      ['---_' + '-' * 12], ['---_---_____----'],
-                      ['________---_----'], ['_--_-----_-_----'],
-                      ['_-__-1____-_----'], ['--_--_____-_____'],
-                      ['___-__-------_--'], ['_----_______-_--'],
-                      ['______-_-_---_--'], ['---_-_-_-_______'],
-                      ['____-_-_-_---_--'], ['2___-_-_-___-_--'],
-                      ['_----_-_-----_--'], ['W_____-_______--']])
+    board = [
+        ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '0'],
+        ['-', '-', '-', '_', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+        ['-', '-', '-', '_', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
+        ['-', '-', '-', '_', '-', '-', '-', '_', '_', '_', '_', '_', '-', '-', '-', '-'],
+        ['_', '_', '_', '_', '_', '_', '_', '_', '-', '-', '-', '_', '-', '-', '-', '-'],
+        ['_', '-', '-', '_', '-', '-', '-', '-', '-', '_', '-', '_', '-', '-', '-', '-'],
+        ['_', '-', '_', '_', '-', '1', '_', '_', '_', '_', '-', '_', '-', '-', '-', '-'],
+        ['-', '-', '_', '-', '-', '_', '_', '_', '_', '_', '-', '_', '_', '_', '_', '_'],
+        ['___-__-------_--'], ['_----_______-_--'],
+        ['______-_-_---_--'], ['---_-_-_-_______'],
+        ['____-_-_-_---_--'], ['2___-_-_-___-_--'],
+        ['_----_-_-----_--'], ['W_____-_______--']]
     return board
 
 
 class GameState(object):
-    def __init__(self):
-        self.__width = WIDTH
-        self.__height = HEIGHT
+    def __init__(self, width=WIDTH, height=HEIGHT, corona_1_loc=(6, 5),
+                 corona_2_loc=(13, 0), location=(0, WIDTH - 1), board=None):
+        self.__width = width
+        self.__height = height
         self.__score = START_SCORE
         self.__board = create_board()
-        self.__location = (0, self.__width - 1)
-        self.__corona_1_location = (6, 5)
-        self.__corona_2_location = (13, 0)
+        self.__location = location
+        self.__corona_1_location = corona_1_loc
+        self.__corona_2_location = corona_2_loc
         self.__target = (self.__height - 1, 0)
         self.__done = False
         self.__mask = False
@@ -56,6 +62,7 @@ class GameState(object):
                 return True
             return self.__board[location[0]][location[1]] == '_' or \
                    self.__board[location[0]][location[1]] == 'm'
+        print(self.__board[6][0])
         return self.__board[location[0]][location[1]] == '_'
 
     def _is_left_legal_action(self, location, player):
@@ -125,16 +132,16 @@ class GameState(object):
         else:
             old_location = self.__corona_2_location
         if action == Action.UP:
-            new_location = (old_location[0]-1, old_location[1])
+            new_location = (old_location[0] - 1, old_location[1])
             self.__board[old_location[0]][old_location[1]] = "_"
         elif action == Action.DOWN:
-            new_location = (old_location[0]+1, old_location[1])
+            new_location = (old_location[0] + 1, old_location[1])
             self.__board[old_location[0]][old_location[1]] = "_"
         elif action == Action.RIGHT:
-            new_location = (old_location[0], old_location[1]+1)
+            new_location = (old_location[0], old_location[1] + 1)
             self.__board[old_location[0]][old_location[1]] = "_"
         elif action == Action.LEFT:
-            new_location = (old_location[0], old_location[1]-1)
+            new_location = (old_location[0], old_location[1] - 1)
             self.__board[old_location[0]][old_location[1]] = "_"
         else:
             new_location = old_location
@@ -150,8 +157,19 @@ class GameState(object):
             self.__corona_2_location = new_location
             self.__board[new_location[0]][new_location[1]] = '2'
 
-        def generate_successor(self, player, action1, action2=None):
+    def generate_successor(self, player, action):
+        successor = GameState(width=self.__width, height=self.__height,
+                              corona_1_loc=self.__corona_1_location,
+                              corona_2_loc=self.__corona_2_location,
+                              location=self.__location,
+                              board=self.__board.copy())
+        successor.apply_action(action, player)
+        return successor
+
+    def __str__(self):
+        print(self.__board)
+        return ''
 
 
 ga = GameState()
-create_board()
+print(ga.get_legal_actions(1))
