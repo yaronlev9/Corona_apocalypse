@@ -27,13 +27,10 @@ class Display:
         self.label_dict = dict()
         self.create_board(initial_board)
 
-    def draw_rectangle(self, row_index, col_index, color):
-        self.canvas_list[row_index][col_index].create_rectangle((SQUARE_SIZE * row_index, SQUARE_SIZE * col_index),
-                                                                (SQUARE_SIZE * (row_index + 1),
-                                                                 SQUARE_SIZE * (col_index + 1)),
-                                                                fill=color)
-
     def create_board(self, initial_board):
+        """
+        creates a new board gui with a given initial board.
+        """
         for row_index in range(WIDTH):
             self.canvas_list.append([])
             for col_index in range(HEIGHT):
@@ -47,63 +44,24 @@ class Display:
                 if initial_board[row_index][col_index] == TARGET:
                     tk.Label(self.root, image=self.finish_img).grid(row=row_index, column=col_index)
 
+    def make_label(self, row_index, col_index, image):
+        label = tk.Label(self.root, image=image)
+        label.grid(row=row_index, column=col_index)
+        self.label_dict[(row_index, col_index)] = label
+
     def draw_state(self, state):
+        """
+        draws a given state on the gui board.
+        """
         for row_index in range(len(state)):
             for col_index in range(len(state[row_index])):
                 if state[row_index][col_index] == CORONA_ILL_1 or state[row_index][col_index] == CORONA_ILL_2:
-                    label = tk.Label(self.root, image=self.corona_img)
-                    label.grid(row=row_index, column=col_index)
-                    self.label_dict[(row_index, col_index)] = label
+                    self.make_label(row_index, col_index, self.corona_img)
                 elif state[row_index][col_index] == CITIZEN:
-                    label = tk.Label(self.root, image=self.player_img)
-                    label.grid(row=row_index, column=col_index)
-                    self.label_dict[(row_index, col_index)] = label
+                    self.make_label(row_index, col_index, self.player_img)
                 elif state[row_index][col_index] == MASK:
-                    label = tk.Label(self.root, image=self.mask_img)
-                    label.grid(row=row_index, column=col_index)
-                    self.label_dict[(row_index, col_index)] = label
+                    self.make_label(row_index, col_index, self.mask_img)
                 elif state[row_index][col_index] != WALL and state[row_index][col_index] != TARGET \
                         and (row_index, col_index) in self.label_dict:
                     self.label_dict[(row_index, col_index)].destroy()
                     self.label_dict.pop((row_index, col_index), None)
-
-# simple test to check the code
-if __name__ == '__main__':
-    board = [
-        ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '0'],
-        ['-', '-', '-', '_', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
-        ['-', '-', '-', '_', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
-        ['-', '-', '-', '_', '-', '-', '-', 'm', '_', '_', '_', '_', '-', '-', '-', '-'],
-        ['_', '_', '_', '_', '_', '_', '_', '_', '-', '-', '-', '_', '-', '-', '-', '-'],
-        ['_', '-', '-', '_', '-', '-', '-', '-', '-', '_', '-', '_', '-', '-', '-', '-'],
-        ['_', '-', '_', '_', '-', '1', '_', '_', '_', '_', '-', '_', '-', '-', '-', '-'],
-        ['-', '-', '_', '-', '-', '_', '_', '_', '_', '_', '-', '_', '_', '_', '_', '_'],
-        ['_', '_', '_', '-', '_', '_', '-', '-', '-', '-', '-', '-', '-', '_', '-', '-'],
-        ['_', '-', '-', '-', '-', '_', '_', '_', '_', '_', '_', '_', '-', '_', '-', '-'],
-        ['_', '_', '_', '_', '_', '_', '-', '_', '-', '_', '-', '-', '-', '_', '-', '-'],
-        ['-', '-', '-', '_', '-', '_', '-', '_', '-', '_', '_', '_', '_', '_', '_', '_'],
-        ['_', '_', '_', 'm', '-', '_', '-', '_', '-', '_', '-', '-', '-', '_', '-', '-'],
-        ['2', '_', '_', '_', '-', '_', '-', '_', '-', '_', '_', '_', '-', '_', '-', '-'],
-        ['_', '-', '-', '-', '-', '_', '-', '_', '-', '-', '-', '-', '-', '_', '-', '-'],
-        ['W', '_', '_', '_', '_', '_', '-', '_', '_', '_', 'm', '_', '_', '_', '-', '-']]
-    # new_board = [
-    #     ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '0', '_'],
-    #     ['-', '-', '-', '_', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
-    #     ['-', '-', '-', '_', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
-    #     ['-', '-', '-', '_', '-', '-', '-', '_', '_', '_', '_', '_', '-', '-', '-', '-'],
-    #     ['_', '_', '_', '_', '_', '_', '_', '_', '-', '-', '-', '_', '-', '-', '-', '-'],
-    #     ['_', '-', '-', '_', '-', '-', '-', '-', '-', '_', '-', '_', '-', '-', '-', '-'],
-    #     ['_', '-', '_', '_', '-', '_', '1', '_', '_', '_', '-', '_', '-', '-', '-', '-'],
-    #     ['-', '-', '_', '-', '-', '_', '_', '_', '_', '_', '-', '_', '_', '_', '_', '_'],
-    #     ['_', '_', '_', '-', '_', '_', '-', '-', '-', '-', '-', '-', '-', '_', '-', '-'],
-    #     ['_', '-', '-', '-', '-', '_', '_', '_', '_', '_', '_', '_', '-', '_', '-', '-'],
-    #     ['_', '_', '_', '_', '_', '_', '-', '_', '-', '_', '-', '-', '-', '_', '-', '-'],
-    #     ['-', '-', '-', '_', '-', '_', '-', '_', '-', '_', '_', '_', '_', '_', '_', '_'],
-    #     ['_', '_', '_', '_', '-', '_', '-', '_', '-', '_', '-', '-', '-', '_', '-', '-'],
-    #     ['2', '_', '_', '_', '-', '_', '-', '_', '-', '_', '_', '_', '-', '_', '-', '-'],
-    #     ['_', '-', '-', '-', '-', '_', '-', '_', '-', '-', '-', '-', '-', '_', '-', '-'],
-    #     ['W', '_', '_', '_', '_', '_', '-', '_', '_', '_', '_', '_', '_', '_', '-', '-']]
-    display = Display(board)
-    display.draw_state(board)
-    # display.draw_state(new_board)
-    display.root.mainloop()
