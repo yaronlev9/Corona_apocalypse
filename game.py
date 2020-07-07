@@ -32,6 +32,8 @@ class Game(object):
             opponent_action2 = random.choice(self._state.get_legal_actions(2))
             self._state.apply_action(opponent_action2, 2)
             # self.display.update_state(self._state, action, opponent_action)
+        print(self._state)
+        print("winnnnnnn")
         return
 
 

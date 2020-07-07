@@ -179,7 +179,8 @@ class GameState(object):
         else:
             new_location = old_location
         if player == 0:
-            self.__score -= 1
+            if action != Action.STOP:
+                self.__score -= 1
             self.__location = new_location
             if self.__board[new_location[0]][new_location[1]] == 'm':
                 self.__mask = True
