@@ -37,7 +37,7 @@ def create_board():
         ['_', '_', '_', '_', '-', '_', '-', '_', '-', '_', '-', '-', '-', '_', '-', '-'],
         ['2', '_', '_', '_', '-', '_', '-', '_', '-', '_', '_', '_', '-', '_', '-', '-'],
         ['_', '-', '-', '-', '-', '_', '-', '_', '-', '-', '-', '-', '-', '_', '-', '-'],
-        ['W', '_', '_', '_', '_', '_', '-', '_', '_', '_', '_', '_', '_', '_', '-', '-']]
+        ['_', '_', '_', '_', '_', '_', '-', '_', '_', '_', '_', '_', '_', '_', '-', '-']]
 
     return board
 
@@ -55,6 +55,7 @@ class GameState(object):
         self.__target = (self.__height - 1, 0)
         self.__done = False
         self.__mask = False
+        self.dict_of_moves = {Action.UP: False, Action.DOWN: False, Action.RIGHT: False, Action.LEFT: False}
         self.__mask_locations = [(6, 0), (7, 15)]
 
     def _is_right_legal_action(self, location, player):
@@ -62,11 +63,16 @@ class GameState(object):
             return False
         if player == 0:
             if self.__mask:
-                if self.__board[location[0]][location[1]] == '-':
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2':
+                    if location[1] + 1 >= self.__width or self.__board[location[0]][location[1] + 1] != '_':
+                        return False
+                    self.dict_of_moves[Action.RIGHT] = True
+                    return True
+                else:
+                    if self.__board[location[0]][location[1]] == '_':
+                        return True
                     return False
-                return True
-            return self.__board[location[0]][location[1]] == '_' or \
-                   self.__board[location[0]][location[1]] == 'm'
+            return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
         return self.__board[location[0]][location[1]] == '_'
 
     def _is_left_legal_action(self, location, player):
@@ -74,11 +80,16 @@ class GameState(object):
             return False
         if player == 0:
             if self.__mask:
-                if self.__board[location[0]][location[1]] == '-':
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2':
+                    if location[1] - 1 < 0 or self.__board[location[0]][location[1] - 1] != '_':
+                        return False
+                    self.dict_of_moves[Action.LEFT] = True
+                    return True
+                else:
+                    if self.__board[location[0]][location[1]] == '_':
+                        return True
                     return False
-                return True
-            return self.__board[location[0]][location[1]] == '_' or \
-                   self.__board[location[0]][location[1]] == 'm'
+            return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
         return self.__board[location[0]][location[1]] == '_'
 
     def _is_up_legal_action(self, location, player):
@@ -86,11 +97,16 @@ class GameState(object):
             return False
         if player == 0:
             if self.__mask:
-                if self.__board[location[0]][location[1]] == '-':
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2':
+                    if location[0] - 1 < 0 or self.__board[location[0] - 1][location[1]] != '_':
+                        return False
+                    self.dict_of_moves[Action.UP] = True
+                    return True
+                else:
+                    if self.__board[location[0]][location[1]] == '_':
+                        return True
                     return False
-                return True
-            return self.__board[location[0]][location[1]] == '_' or \
-                   self.__board[location[0]][location[1]] == 'm'
+            return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
         return self.__board[location[0]][location[1]] == '_'
 
     def _is_down_legal_action(self, location, player):
@@ -98,11 +114,16 @@ class GameState(object):
             return False
         if player == 0:
             if self.__mask:
-                if self.__board[location[0]][location[1]] == '-':
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2':
+                    if location[0] + 1 >= self.__height or self.__board[location[0] + 1][location[1]] != '_':
+                        return False
+                    self.dict_of_moves[Action.DOWN] = True
+                    return True
+                else:
+                    if self.__board[location[0]][location[1]] == '_':
+                        return True
                     return False
-                return True
-            return self.__board[location[0]][location[1]] == '_' or \
-                   self.__board[location[0]][location[1]] == 'm'
+            return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
         return self.__board[location[0]][location[1]] == '_'
 
     def get_legal_actions(self, player):
@@ -127,8 +148,8 @@ class GameState(object):
         return legal_actions
 
     def apply_action(self, action, player):
-        # if action not in self.get_legal_actions(player):
-        #     raise Exception("illegal action.")
+        if action not in self.get_legal_actions(player):
+            return
         if player == 0:
             old_location = self.__location
         elif player == 1:
@@ -137,19 +158,28 @@ class GameState(object):
             old_location = self.__corona_2_location
         if action == Action.UP:
             new_location = (old_location[0] - 1, old_location[1])
+            if self.dict_of_moves[Action.UP]:
+                new_location = (new_location[0] - 1, new_location[1])
             self.__board[old_location[0]][old_location[1]] = "_"
         elif action == Action.DOWN:
             new_location = (old_location[0] + 1, old_location[1])
+            if self.dict_of_moves[Action.DOWN]:
+                new_location = (new_location[0] + 1, new_location[1])
             self.__board[old_location[0]][old_location[1]] = "_"
         elif action == Action.RIGHT:
             new_location = (old_location[0], old_location[1] + 1)
+            if self.dict_of_moves[Action.RIGHT]:
+                new_location = (new_location[0], new_location[1] + 1)
             self.__board[old_location[0]][old_location[1]] = "_"
         elif action == Action.LEFT:
             new_location = (old_location[0], old_location[1] - 1)
+            if self.dict_of_moves[Action.LEFT]:
+                new_location = (new_location[0], new_location[1] - 1)
             self.__board[old_location[0]][old_location[1]] = "_"
         else:
             new_location = old_location
         if player == 0:
+            self.__score -= 1
             self.__location = new_location
             if self.__board[new_location[0]][new_location[1]] == 'm':
                 self.__mask = True
@@ -162,6 +192,8 @@ class GameState(object):
         elif player == 2:
             self.__corona_2_location = new_location
             self.__board[new_location[0]][new_location[1]] = '2'
+        for key in self.dict_of_moves:
+            self.dict_of_moves[key] = False
 
     def generate_successor(self, player, action):
         successor = GameState(width=self.__width, height=self.__height,
@@ -201,9 +233,11 @@ class GameState(object):
     def get_done(self):
         return self.__done
 
+    def get_score(self):
+        return self.__score
 
 # ga = GameState()
 # print(ga)
+# print(ga.get_legal_actions(0))
+# ga.apply_action(Action.LEFT, 0)
 # print(ga)
-# t = ga.generate_successor(0, Action.LEFT)
-# print(t)

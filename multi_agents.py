@@ -29,7 +29,7 @@ class ExpectimaxAgent:
             lst = [(self.expectimax_helper(current_depth, successor[0], 1)[0],
                     successor[1]) for
                    successor in successors]
-            print(lst)
+            # print(lst)
             lst = sorted(lst, key=itemgetter(0))
             return lst[0]
         else:
@@ -51,7 +51,7 @@ class ExpectimaxAgent:
 def evaluation_function(current_game_state):
     board = current_game_state.get_board()
     target = current_game_state.get_target()
-    distance_from_target = manhattan_distance(target, current_game_state.get_location())
+    distance_from_target = pitagoras(target, current_game_state.get_location())
     distance_from_corona_1 = manhattan_distance(current_game_state.get_corona_1_location(),
                                                 current_game_state.get_location())
     distance_from_corona_2 = manhattan_distance(current_game_state.get_corona_2_location(),
@@ -63,15 +63,17 @@ def evaluation_function(current_game_state):
     dist_from_closest_mask = min([dist_from_mask_1, dist_from_mask_2])
     if current_game_state.get_mask_status():
         return distance_from_target * 10
-    return (distance_from_target * 10) + (dist_from_closest_mask * 5) - (distance_from_corona_1 * 3) - \
-           (distance_from_corona_2 * 3)
+    return (distance_from_target * 10) + current_game_state.get_score()
+
+
+def pitagoras(xy1, xy2):
+    return sqrt((xy1[0] - xy2[0]) * (xy1[0] - xy2[0]) + (xy1[1] - xy2[1]) * (xy1[1] - xy2[1]))
 
 
 def manhattan_distance(xy1, xy2):
     "Returns the Manhattan distance between points xy1 and xy2"
     return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
-
-ga = game_state.GameState()
-t = ExpectimaxAgent(1)
-print(t.get_action(ga))
+# ga = game_state.GameState()
+# t = ExpectimaxAgent(1)
+# print(t.get_action(ga))
