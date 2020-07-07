@@ -55,6 +55,7 @@ class GameState(object):
         self.__target = (self.__height - 1, 0)
         self.__done = False
         self.__mask = False
+        self.__mask_locations = [(6, 0), (7, 15)]
 
     def _is_right_legal_action(self, location, player):
         if location[1] >= self.__width:
@@ -153,6 +154,8 @@ class GameState(object):
             if self.__board[new_location[0]][new_location[1]] == 'm':
                 self.__mask = True
             self.__board[new_location[0]][new_location[1]] = '0'
+            if new_location == self.__target:
+                self.__done = True
         elif player == 1:
             self.__corona_1_location = new_location
             self.__board[new_location[0]][new_location[1]] = '1'
@@ -189,9 +192,18 @@ class GameState(object):
     def get_corona_2_location(self):
         return self.__corona_2_location
 
+    def get_mask_status(self):
+        return self.__mask
 
-ga = GameState()
-print(ga)
-print(ga)
-t = ga.generate_successor(0, Action.LEFT)
-print(t)
+    def get_mask_locations(self):
+        return self.__mask_locations
+
+    def get_done(self):
+        return self.__done
+
+
+# ga = GameState()
+# print(ga)
+# print(ga)
+# t = ga.generate_successor(0, Action.LEFT)
+# print(t)
