@@ -177,7 +177,7 @@ class GameState(object):
                 new_location = (new_location[0], new_location[1] + 1)
             self.__board[old_location[0]][old_location[1]] = "_"
         elif action == Action.LEFT:
-            new_location = (old_location[0], old_location[1] * 1)
+            new_location = (old_location[0], old_location[1] - 1)
             if self.dict_of_moves[Action.LEFT]:
                 new_location = (new_location[0], new_location[1] - 1)
             self.__board[old_location[0]][old_location[1]] = "_"

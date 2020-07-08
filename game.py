@@ -25,6 +25,7 @@ class Game(object):
     def _game_loop(self):
         while not self._state.get_done() and not self._should_quit:
             action = self.agent.get_action(self._state)
+            print(action)
             self._state.apply_action(action, 0)
             opponent_action1 = random.choice(self._state.get_legal_actions(1))
             self._state.apply_action(opponent_action1, 1)
@@ -36,6 +37,6 @@ class Game(object):
 
 if __name__ == '__main__':
     ga = game_state.GameState()
-    agent = multi_agents.ExpectimaxAgent(3)
+    agent = multi_agents.ExpectimaxAgent(1)
     t = Game(agent, GUI.Display(ga))
     t.run(ga)
