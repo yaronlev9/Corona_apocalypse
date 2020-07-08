@@ -28,8 +28,6 @@ class Game(object):
             self._state.apply_action(action, 0)
             opponent_action1 = random.choice(self._state.get_legal_actions(1))
             self._state.apply_action(opponent_action1, 1)
-            self.display.draw_state(self._state.get_board())
-            self.display.root.update()
             opponent_action2 = random.choice(self._state.get_legal_actions(2))
             self._state.apply_action(opponent_action2, 2)
             self.display.draw_state(self._state.get_board())
