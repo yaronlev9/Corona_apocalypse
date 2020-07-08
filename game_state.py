@@ -194,14 +194,14 @@ class GameState(object):
                 self.__done = True
         elif player == 1:
             self.__corona_1_location = new_location
-            self.__board[new_location[0]][new_location[1]] = '1'
-            if self.__board[old_location[0]][old_location[1]] == '0':
+            if self.__board[new_location[0]][new_location[1]] == '0':
                 self.__done = True
+            self.__board[new_location[0]][new_location[1]] = '1'
         elif player == 2:
             self.__corona_2_location = new_location
-            self.__board[new_location[0]][new_location[1]] = '2'
-            if self.__board[old_location[0]][old_location[1]] == '0':
+            if self.__board[new_location[0]][new_location[1]] == '0':
                 self.__done = True
+            self.__board[new_location[0]][new_location[1]] = '2'
         for key in self.dict_of_moves:
             self.dict_of_moves[key] = False
 
