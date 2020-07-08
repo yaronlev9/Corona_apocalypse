@@ -15,48 +15,53 @@ START_SCORE = 0
 CITIZEN = '0'
 CORONA_ILL_1 = '1'
 CORONA_ILL_2 = '2'
-WALL = '-'
+WALL = '*'
 EMPTY_LOCATION = '_'
 TARGET = 'W'
 
 
-def create_board():
-    board = [
-        ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '0'],
-        ['-', '-', '-', '_', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
-        ['-', '-', '-', '_', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
-        ['-', '-', '-', '_', '-', '-', '-', '_', '_', '_', '_', '_', '-', '-', '-', '-'],
-        ['_', '_', '_', '_', '_', '_', '_', '_', '-', '-', '-', '_', '-', '-', '-', '-'],
-        ['_', '-', '-', '_', '-', '-', '-', '-', '-', '_', '-', '_', '-', '-', '-', '-'],
-        ['m', '-', '_', '_', '-', '1', '_', '_', '_', '_', '-', '_', '-', '-', '-', '-'],
-        ['-', '-', '_', '-', '-', '_', '_', '_', '_', '_', '-', '_', '_', '_', '_', 'm'],
-        ['_', '_', '_', '-', '_', '_', '-', '-', '-', '-', '-', '-', '-', '_', '-', '-'],
-        ['_', '-', '-', '-', '-', '_', '_', '_', '_', '_', '_', '_', '-', '_', '-', '-'],
-        ['_', '_', '_', '_', '_', '_', '-', '_', '-', '_', '-', '-', '-', '_', '-', '-'],
-        ['-', '-', '-', '_', '-', '_', '-', '_', '-', '_', '_', '_', '_', '_', '_', '_'],
-        ['_', '_', '_', '_', '-', '_', '-', '_', '-', '_', '-', '-', '-', '_', '-', '-'],
-        ['2', '_', '_', '_', '-', '_', '-', '_', '-', '_', '_', '_', '-', '_', '-', '-'],
-        ['_', '-', '-', '-', '-', '_', '-', '_', '-', '-', '-', '-', '-', '_', '-', '-'],
-        ['_', '_', '_', '_', '_', '_', '-', '_', '_', '_', '_', '_', '_', '_', '-', '-']]
-
-    return board
-
-
 class GameState(object):
-    def __init__(self, width=WIDTH, height=HEIGHT, corona_1_loc=(6, 5),
+    def __init__(self, width=WIDTH, height=HEIGHT, corona_1_loc=(7, 2),
                  corona_2_loc=(13, 0), location=(0, WIDTH - 1), board=None):
         self.__width = width
         self.__height = height
         self.__score = START_SCORE
-        self.__board = create_board()
-        self.__location = location
         self.__corona_1_location = corona_1_loc
         self.__corona_2_location = corona_2_loc
+        self.__mask_locations = [(6, 0), (7, 15)]
+        self.__board = self.create_board()
+        self.__location = location
         self.__target = (self.__height - 1, 0)
         self.__done = False
         self.__mask = False
         self.dict_of_moves = {Action.UP: False, Action.DOWN: False, Action.RIGHT: False, Action.LEFT: False}
-        self.__mask_locations = [(6, 0), (7, 15)]
+
+    def create_board(self):
+        board = [
+            ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '0'],
+            ['*', '*', '*', '_', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'],
+            ['*', '*', '*', '_', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'],
+            ['*', '*', '*', '_', '*', '*', '*', '_', '_', '_', '_', '_', '_', '_', '*', '*'],
+            ['_', '_', '_', '_', '_', '_', '_', '_', '_', '*', '*', '*', '_', '_', '*', '*'],
+            ['_', '*', '*', '_', '_', '*', '*', '*', '*', '*', '_', '*', '_', '_', '*', '*'],
+            ['_', '*', '_', '_', '_', '_', '_', '_', '_', '_', '_', '*', '_', '_', '*', '*'],
+            ['*', '*', '_', '_', '_', '_', '_', '_', '_', '_', '_', '*', '_', '_', '_', '_'],
+            ['_', '_', '_', '_', '_', '_', '_', '*', '*', '*', '*', '*', '_', '*', '*', '*'],
+            ['_', '_', '_', '*', '*', '*', '*', '_', '_', '_', '_', '_', '_', '_', '*', '*'],
+            ['_', '_', '_', '_', '_', '_', '*', '_', '*', '_', '*', '*', '*', '_', '*', '*'],
+            ['*', '*', '*', '_', '*', '_', '*', '_', '*', '_', '_', '_', '_', '_', '_', '_'],
+            ['_', '_', '_', '_', '*', '_', '_', '_', '*', '_', '*', '*', '*', '_', '*', '*'],
+            ['_', '_', '_', '_', '*', '_', '_', '_', '*', '_', '_', '_', '*', '_', '*', '*'],
+            ['_', '*', '_', '*', '*', '_', '*', '_', '*', '*', '*', '*', '*', '_', '*', '*'],
+            ['_', '_', '_', '_', '_', '_', '*', '_', '_', '_', '_', '_', '_', '_', '*', '*']]
+        if board[self.__corona_1_location[0]][self.__corona_1_location[1]] == '_':
+            board[self.__corona_1_location[0]][self.__corona_1_location[1]] = '1'
+        if board[self.__corona_1_location[0]][self.__corona_1_location[1]] == '_':
+            board[self.__corona_2_location[0]][self.__corona_2_location[1]] = '2'
+        for mask in self.__mask_locations:
+            if board[mask[0]][mask[1]] == '_':
+                board[mask[0]][mask[1]] = 'm'
+        return board
 
     def _is_right_legal_action(self, location, player):
         if location[1] >= self.__width:
@@ -81,7 +86,7 @@ class GameState(object):
         if player == 0:
             if self.__mask:
                 if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2':
-                    if location[1] - 1 < 0 or self.__board[location[0]][location[1] - 1] != '_':
+                    if location[1] - 1 < 0 or self.__board[location[0]][location[1] * 1] != '_':
                         return False
                     self.dict_of_moves[Action.LEFT] = True
                     return True
@@ -98,7 +103,7 @@ class GameState(object):
         if player == 0:
             if self.__mask:
                 if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2':
-                    if location[0] - 1 < 0 or self.__board[location[0] - 1][location[1]] != '_':
+                    if location[0] - 1 < 0 or self.__board[location[0] * 1][location[1]] != '_':
                         return False
                     self.dict_of_moves[Action.UP] = True
                     return True
@@ -172,7 +177,7 @@ class GameState(object):
                 new_location = (new_location[0], new_location[1] + 1)
             self.__board[old_location[0]][old_location[1]] = "_"
         elif action == Action.LEFT:
-            new_location = (old_location[0], old_location[1] - 1)
+            new_location = (old_location[0], old_location[1] * 1)
             if self.dict_of_moves[Action.LEFT]:
                 new_location = (new_location[0], new_location[1] - 1)
             self.__board[old_location[0]][old_location[1]] = "_"
@@ -237,8 +242,3 @@ class GameState(object):
     def get_score(self):
         return self.__score
 
-# ga = GameState()
-# print(ga)
-# print(ga.get_legal_actions(0))
-# ga.apply_action(Action.LEFT, 0)
-# print(ga)
