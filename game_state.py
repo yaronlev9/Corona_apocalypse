@@ -23,7 +23,7 @@ TARGET = 'W'
 
 class GameState(object):
     def __init__(self, width=WIDTH, height=HEIGHT, corona_1_loc=(7, 2),
-                 corona_2_loc=(13, 0),corona_3_loc=(7, 13), location=(0, WIDTH - 1), board=None):
+                 corona_2_loc=(13, 0), corona_3_loc=(7, 13), location=(0, WIDTH - 1), board=None):
         self.__width = width
         self.__height = height
         self.__score = START_SCORE
@@ -35,7 +35,7 @@ class GameState(object):
         self.__location = location
         self.__target = (self.__height - 1, 0)
         self.__done = False
-        self.__mask = True
+        self.__mask = False
         self.dict_of_moves = {Action.UP: False, Action.DOWN: False, Action.RIGHT: False, Action.LEFT: False}
 
     def create_board(self):
@@ -72,7 +72,8 @@ class GameState(object):
             return False
         if player == 0:
             if self.__mask:
-                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2':
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2' \
+                        or self.__board[location[0]][location[1]] == '3':
                     if location[1] + 1 >= self.__width or self.__board[location[0]][location[1] + 1] != '_':
                         return False
                     self.dict_of_moves[Action.RIGHT] = True
@@ -90,7 +91,8 @@ class GameState(object):
             return False
         if player == 0:
             if self.__mask:
-                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2':
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2' \
+                        or self.__board[location[0]][location[1]] == '3':
                     if location[1] - 1 < 0 or self.__board[location[0]][location[1] * 1] != '_':
                         return False
                     self.dict_of_moves[Action.LEFT] = True
@@ -108,7 +110,8 @@ class GameState(object):
             return False
         if player == 0:
             if self.__mask:
-                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2':
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2' \
+                        or self.__board[location[0]][location[1]] == '3':
                     if location[0] - 1 < 0 or self.__board[location[0] * 1][location[1]] != '_':
                         return False
                     self.dict_of_moves[Action.UP] = True
@@ -126,7 +129,8 @@ class GameState(object):
             return False
         if player == 0:
             if self.__mask:
-                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2':
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2' \
+                        or self.__board[location[0]][location[1]] == '3':
                     if location[0] + 1 >= self.__height or self.__board[location[0] + 1][location[1]] != '_':
                         return False
                     self.dict_of_moves[Action.DOWN] = True
@@ -147,6 +151,8 @@ class GameState(object):
             location = self.__corona_1_location
         elif player == 2:
             location = self.__corona_2_location
+        elif player == 3:
+            location = self.__corona_3_location
         else:
             raise Exception("Illegal agent index.")
         if self._is_right_legal_action((location[0], location[1] + 1), player):
@@ -167,8 +173,10 @@ class GameState(object):
             old_location = self.__location
         elif player == 1:
             old_location = self.__corona_1_location
-        else:
+        elif player == 2:
             old_location = self.__corona_2_location
+        else:
+            old_location = self.__corona_3_location
         if action == Action.UP:
             new_location = (old_location[0] - 1, old_location[1])
             if self.dict_of_moves[Action.UP]:
@@ -210,6 +218,11 @@ class GameState(object):
             if self.__board[new_location[0]][new_location[1]] == '0' and not self.__mask:
                 self.__done = True
             self.__board[new_location[0]][new_location[1]] = '2'
+        elif player == 3:
+            self.__corona_3_location = new_location
+            if self.__board[new_location[0]][new_location[1]] == '0' and not self.__mask:
+                self.__done = True
+            self.__board[new_location[0]][new_location[1]] = '3'
         for key in self.dict_of_moves:
             self.dict_of_moves[key] = False
 
@@ -217,6 +230,7 @@ class GameState(object):
         successor = GameState(width=self.__width, height=self.__height,
                               corona_1_loc=self.__corona_1_location,
                               corona_2_loc=self.__corona_2_location,
+                              corona_3_loc=self.__corona_3_location,
                               location=self.__location,
                               board=self.__board.copy())
         successor.apply_action(action, player)
@@ -241,6 +255,9 @@ class GameState(object):
 
     def get_corona_2_location(self):
         return self.__corona_2_location
+
+    def get_corona_3_location(self):
+        return self.__corona_3_location
 
     def get_mask_status(self):
         return self.__mask

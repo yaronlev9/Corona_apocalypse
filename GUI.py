@@ -8,6 +8,7 @@ START_SCORE = 0
 CITIZEN = '0'
 CORONA_ILL_1 = '1'
 CORONA_ILL_2 = '2'
+CORONA_ILL_3 = '3'
 WALL = '*'
 EMPTY_LOCATION = '_'
 TARGET = 'W'
@@ -61,7 +62,7 @@ class Display:
                 if (15, 0) in self.label_dict:
                     tk.Label(self.root, image=self.finish_img).grid(row=15, column=0)
                     self.label_dict.pop((15, 0))
-                if state[row_index][col_index] == CORONA_ILL_1 or state[row_index][col_index] == CORONA_ILL_2:
+                if state[row_index][col_index] == CORONA_ILL_1 or state[row_index][col_index] == CORONA_ILL_2 or state[row_index][col_index] == CORONA_ILL_3:
                     self.make_label(row_index, col_index, self.corona_img)
                 elif state[row_index][col_index] == CITIZEN:
                     self.make_label(row_index, col_index, self.player_img)

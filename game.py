@@ -31,12 +31,14 @@ class Game(object):
             self._state.apply_action(opponent_action1, 1)
             opponent_action2 = random.choice(self._state.get_legal_actions(2))
             self._state.apply_action(opponent_action2, 2)
+            opponent_action3 = random.choice(self._state.get_legal_actions(3))
+            self._state.apply_action(opponent_action3, 3)
             self.display.draw_state(self._state.get_board())
             self.display.root.update()
 
 
 if __name__ == '__main__':
     ga = game_state.GameState()
-    agent = multi_agents.ExpectimaxAgent(3)
+    agent = multi_agents.ExpectimaxAgent(2)
     t = Game(agent, GUI.Display(ga))
     t.run(ga)

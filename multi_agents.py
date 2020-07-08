@@ -38,7 +38,10 @@ class ExpectimaxAgent:
                 temp_state = (state.generate_successor(1, action1), action1)
                 legal_actions2 = temp_state[0].get_legal_actions(2)
                 for action2 in legal_actions2:
-                    successors.append((temp_state[0].generate_successor(2, action2), action2))
+                    temp_state2 = (temp_state[0].generate_successor(2, action2), action2)
+                    legal_actions3 = temp_state2[0].get_legal_actions(3)
+                    for action3 in legal_actions3:
+                        successors.append((temp_state2[0].generate_successor(3, action3), action3))
             lst = [
                 (self.expectimax_helper(current_depth + 1, successor[0], 0)[0],
                  successor[1]) for
