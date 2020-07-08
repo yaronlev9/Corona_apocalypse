@@ -34,14 +34,14 @@ class Display:
         for row_index in range(WIDTH):
             self.canvas_list.append([])
             for col_index in range(HEIGHT):
-                if initial_board[row_index][col_index] == WALL:
+                if initial_board.get_board()[row_index][col_index] == WALL:
                     self.canvas_list[row_index].append(
                         tk.Canvas(self.root, bg='gray30', width=SQUARE_SIZE, height=SQUARE_SIZE))
                 else:
                     self.canvas_list[row_index].append(
                         tk.Canvas(self.root, bg='white', width=SQUARE_SIZE, height=SQUARE_SIZE))
                 self.canvas_list[row_index][col_index].grid(row=row_index, column=col_index)
-                if initial_board[row_index][col_index] == TARGET:
+                if (row_index, col_index) == initial_board.get_target():
                     tk.Label(self.root, image=self.finish_img).grid(row=row_index, column=col_index)
 
     def make_label(self, row_index, col_index, image):
@@ -55,13 +55,15 @@ class Display:
         """
         for row_index in range(len(state)):
             for col_index in range(len(state[row_index])):
+                if (row_index, col_index) in self.label_dict:
+                    self.label_dict[(row_index, col_index)].destroy()
+                    self.label_dict.pop((row_index, col_index))
+                if (15, 0) in self.label_dict:
+                    tk.Label(self.root, image=self.finish_img).grid(row=15, column=0)
+                    self.label_dict.pop((15, 0))
                 if state[row_index][col_index] == CORONA_ILL_1 or state[row_index][col_index] == CORONA_ILL_2:
                     self.make_label(row_index, col_index, self.corona_img)
                 elif state[row_index][col_index] == CITIZEN:
                     self.make_label(row_index, col_index, self.player_img)
                 elif state[row_index][col_index] == MASK:
                     self.make_label(row_index, col_index, self.mask_img)
-                elif state[row_index][col_index] != WALL and state[row_index][col_index] != TARGET \
-                        and (row_index, col_index) in self.label_dict:
-                    self.label_dict[(row_index, col_index)].destroy()
-                    self.label_dict.pop((row_index, col_index), None)
