@@ -63,6 +63,8 @@ def evaluation_function(current_game_state):
                                  current_game_state.get_location())
     dist_from_closest_mask = min([dist_from_mask_1, dist_from_mask_2])
     if current_game_state.get_mask_status():
+        if distance_from_target == 0:
+            return -inf
         return (distance_from_target * 8) + (distance_from_beginning * 1) + (2 * current_game_state.get_score())
     return (dist_from_closest_mask * 11) + (distance_from_target * 5) - (distance_from_beginning * 5)
 

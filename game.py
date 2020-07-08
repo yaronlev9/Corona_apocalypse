@@ -36,6 +36,6 @@ class Game(object):
 
 if __name__ == '__main__':
     ga = game_state.GameState()
-    agent = multi_agents.ExpectimaxAgent(2)
+    agent = multi_agents.ExpectimaxAgent(3)
     t = Game(agent, GUI.Display(ga))
     t.run(ga)
