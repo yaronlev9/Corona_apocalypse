@@ -36,6 +36,7 @@ class GameState(object):
         self.__target = (self.__height - 1, 0)
         self.__done = False
         self.__mask = False
+        self.__win = False
         self.dict_of_moves = {Action.UP: False, Action.DOWN: False, Action.RIGHT: False, Action.LEFT: False}
 
     def create_board(self):
@@ -207,6 +208,7 @@ class GameState(object):
                 self.__mask = True
             self.__board[new_location[0]][new_location[1]] = '0'
             if new_location == self.__target:
+                self.__win = True
                 self.__done = True
         elif player == 1:
             self.__corona_1_location = new_location
@@ -270,3 +272,6 @@ class GameState(object):
 
     def get_score(self):
         return self.__score
+
+    def get_win(self):
+        return self.__win
