@@ -58,13 +58,13 @@ def evaluation_function(current_game_state):
     distance_from_corona_2 = manhattan_distance(current_game_state.get_corona_2_location(),
                                                 current_game_state.get_location())
     dist_from_mask_1 = pitagoras(current_game_state.get_mask_locations()[0],
-                                          current_game_state.get_location())
+                                 current_game_state.get_location())
     dist_from_mask_2 = pitagoras(current_game_state.get_mask_locations()[1],
-                                          current_game_state.get_location())
+                                 current_game_state.get_location())
     dist_from_closest_mask = min([dist_from_mask_1, dist_from_mask_2])
     if current_game_state.get_mask_status():
-        return (distance_from_target * 8) + (distance_from_beginning * 1) + (2 *current_game_state.get_score())
-    return (dist_from_closest_mask * 6) + (distance_from_target * 6)
+        return (distance_from_target * 8) + (distance_from_beginning * 1) + (2 * current_game_state.get_score())
+    return (dist_from_closest_mask * 11) + (distance_from_target * 5) - (distance_from_beginning * 5)
 
 
 def pitagoras(xy1, xy2):
