@@ -209,7 +209,6 @@ class GameState(object):
             self.__board[new_location[0]][new_location[1]] = '0'
             if new_location == self.__target:
                 self.__win = True
-                self.__done = True
         elif player == 1:
             self.__corona_1_location = new_location
             if self.__board[new_location[0]][new_location[1]] == '0' and not self.__mask:

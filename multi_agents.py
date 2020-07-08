@@ -1,10 +1,23 @@
+import math
+import abc
+import random
 import game_state
 from operator import itemgetter
-from math import *
 
+class Agent(object):
+    def __init__(self):
+        super(Agent, self).__init__()
 
-class ExpectimaxAgent:
+    @abc.abstractmethod
+    def get_action(self, game_state):
+        return
+
+    def stop_running(self):
+        pass
+
+class ExpectimaxAgent(Agent):
     def __init__(self, depth):
+        super().__init__()
         self.depth = depth
 
     def get_action(self, game_state):
@@ -73,7 +86,7 @@ def evaluation_function(current_game_state):
 
 
 def pitagoras(xy1, xy2):
-    return sqrt((xy1[0] - xy2[0]) * (xy1[0] - xy2[0]) + (xy1[1] - xy2[1]) * (xy1[1] - xy2[1]))
+    return math.sqrt((xy1[0] - xy2[0]) * (xy1[0] - xy2[0]) + (xy1[1] - xy2[1]) * (xy1[1] - xy2[1]))
 
 
 def manhattan_distance(xy1, xy2):
@@ -83,3 +96,111 @@ def manhattan_distance(xy1, xy2):
 # ga = game_state.GameState()
 # t = ExpectimaxAgent(1)
 # print(t.get_action(ga))
+
+class Node:
+    def __init__(self, state, player, parent):
+        self.counter = 0
+        self.wins = 0
+        self.loses = 0
+        self.state = state
+        self.player = player
+        self.parent = parent
+        self.score = 0
+        self.simulations_counter = 0
+        self.expanded = False
+
+class MonteCarloTreeSearchAgent(Agent):
+
+    def __init__(self, max_simulations):
+        super().__init__()
+        self.max_simulations = max_simulations
+        self.exploration_param = math.sqrt(2)
+        self.root = None
+
+    def get_action(self, game_state):
+        self.children = []
+        self.num_simulations = 0
+        self.root = Node(game_state, 0, None)
+        self.monte_carlo_tree_search(self.root, 0)
+        return self.best_child()[1]
+
+
+    def monte_carlo_tree_search(self, state, player):
+        cur_state = state
+        board_state = state.state
+        while self.num_simulations < self.max_simulations:
+            leafs = []
+            player = cur_state.player
+            if player == 0:
+                for action in board_state.get_legal_actions(0):
+                    child = Node(board_state.generate_successor(0, action), 1, cur_state)
+                    leafs.append(child)
+                    if cur_state is self.root:
+                        self.children.append((child, action))
+                    self.num_simulations += 1
+                    result = self.run_simulation(child)
+                    self.back_propagate(child, result)
+                    if self.num_simulations == self.max_simulations:
+                        return
+            else:
+                for action1 in board_state.get_legal_actions(1):
+                    state2 = board_state.generate_successor(1, action1)
+                    for action2 in state2.get_legal_actions(2):
+                        child = Node(board_state.generate_successor(2, action2), 0, cur_state)
+                        leafs.append(child)
+                        self.num_simulations += 1
+                        result = self.run_simulation(child)
+                        self.back_propagate(child, result)
+                        if self.num_simulations == self.max_simulations:
+                            return
+            cur_state = random.choice(leafs)
+
+
+    def back_propagate(self, node, result):
+        while node.parent != None:
+            if result == 0 and node.player == 0:
+                node.wins += 1
+            elif result == 1 and node.player == 1:
+                node.wins += 1
+            node.simulations_counter += 1
+            node = node.parent
+
+
+    def run_simulation(self, state):
+        board_state = state.state
+        if state.player == 0:
+            for i in range(1000):
+                board_state = board_state.generate_successor(0, random.choice(board_state.get_legal_actions(0)))
+                board_state = board_state.generate_successor(1, random.choice(board_state.get_legal_actions(1)))
+                board_state = board_state.generate_successor(2, random.choice(board_state.get_legal_actions(2)))
+                if board_state.get_win():
+                    return 0
+                elif board_state.get_done():
+                    return 1
+            return 1
+        elif state.player == 1:
+            for i in range(1000):
+                board_state = board_state.generate_successor(1, random.choice(board_state.get_legal_actions(1)))
+                board_state = board_state.generate_successor(2, random.choice(board_state.get_legal_actions(2)))
+                board_state = board_state.generate_successor(0, random.choice(board_state.get_legal_actions(0)))
+                if board_state.get_win():
+                    return 0
+                elif board_state.get_done():
+                    return 1
+            return 1
+
+    def best_child(self):
+        max = 0
+        best_state = None
+        for state in self.children:
+            score = self.calculate_score(state[0])
+            if score > max:
+                max = score
+                best_state = state
+        return best_state
+
+    def calculate_score(self, state):
+        score = (state.wins/state.simulations_counter) + \
+        self.exploration_param * math.sqrt(math.log((self.num_simulations), math.e)/state.simulations_counter)
+        print(score)
+        return score

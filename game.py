@@ -2,7 +2,6 @@ import game_state
 import multi_agents
 import random
 import GUI
-import tkinter as tk
 
 
 class Game(object):
@@ -25,7 +24,6 @@ class Game(object):
     def _game_loop(self):
         while not self._state.get_done() and not self._should_quit:
             action = self.agent.get_action(self._state)
-            print(self._state.get_legal_actions(0))
             self._state.apply_action(action, 0)
             opponent_action1 = random.choice(self._state.get_legal_actions(1))
             self._state.apply_action(opponent_action1, 1)
@@ -35,10 +33,9 @@ class Game(object):
             self._state.apply_action(opponent_action3, 3)
             self.display.draw_state(self._state.get_board())
             self.display.root.update()
-
-
 if __name__ == '__main__':
     ga = game_state.GameState()
+    #agent = multi_agents.MonteCarloTreeSearchAgent(500)
     agent = multi_agents.ExpectimaxAgent(2)
     t = Game(agent, GUI.Display(ga))
     t.run(ga)

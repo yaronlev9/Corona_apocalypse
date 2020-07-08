@@ -27,6 +27,7 @@ class Display:
         self.mask_img = tk.PhotoImage(file="images//mask.png")
         self.label_dict = dict()
         self.create_board(initial_board)
+        self.locations_dict = {}
 
     def create_board(self, initial_board):
         """
