@@ -1,5 +1,5 @@
 from enum import Enum
-
+from copy import deepcopy
 
 class Action(Enum):
     UP = "UP"
@@ -31,8 +31,8 @@ class GameState(object):
         self.__corona_2_location = corona_2_loc
         self.__corona_3_location = corona_3_loc
         self.__mask_locations = [(6, 0), (7, 15)]
-        self.__board = self.create_board()
         self.__location = location
+        self.__board = self.create_board()
         self.__target = (self.__height - 1, 0)
         self.__done = False
         self.__mask = False
@@ -41,7 +41,7 @@ class GameState(object):
 
     def create_board(self):
         board = [
-            ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '0'],
+            ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_'],
             ['*', '*', '*', '_', '*', '*', '*', '*', '*', '*', '*', '*', '*', '_', '_', '*'],
             ['*', '_', '_', '_', '*', '*', '*', '*', '*', '*', '*', '*', '*', '_', '_', '*'],
             ['*', '*', '*', '_', '*', '*', '*', '_', '_', '_', '_', '_', '_', '_', '_', '*'],
@@ -63,6 +63,7 @@ class GameState(object):
             board[self.__corona_2_location[0]][self.__corona_2_location[1]] = '2'
         if board[self.__corona_3_location[0]][self.__corona_3_location[1]] == '_':
             board[self.__corona_3_location[0]][self.__corona_3_location[1]] = '3'
+        board[self.__location[0]][self.__location[1]] = '0'
         for mask in self.__mask_locations:
             if board[mask[0]][mask[1]] == '_':
                 board[mask[0]][mask[1]] = 'm'
