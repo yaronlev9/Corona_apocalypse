@@ -76,12 +76,19 @@ def evaluation_function(current_game_state):
                                                 current_game_state.get_location())
     distance_from_corona_3 = manhattan_distance(current_game_state.get_corona_3_location(),
                                                 current_game_state.get_location())
-    dist_from_mask_1 = pitagoras(current_game_state.get_mask_locations()[0],
-                                 current_game_state.get_location())
-    dist_from_mask_2 = pitagoras(current_game_state.get_mask_locations()[1],
-                                 current_game_state.get_location())
+    dist_from_mask_1 = 4
+    dist_from_mask_2 = 4
+    if len(current_game_state.get_mask_locations()) >= 1:
+        dist_from_mask_1 = pitagoras(current_game_state.get_mask_locations()[0],
+                                     current_game_state.get_location())
+    if len(current_game_state.get_mask_locations()) >= 2:
+        dist_from_mask_2 = pitagoras(current_game_state.get_mask_locations()[1],
+                                     current_game_state.get_location())
     dist_from_closest_mask = min([dist_from_mask_1, dist_from_mask_2])
     # if current_game_state.get_mask_status():
+    # if current_game_state.get_mask_status() and current_game_state.get_first_mask():
+    #     current_game_state.set_first_mask(False)
+    #     return -100000
     penalty = 1
     mask_reward = 1
     if not current_game_state.get_mask_status():
@@ -97,12 +104,12 @@ def evaluation_function(current_game_state):
             penalty += 1.5
         elif distance_from_corona_3 <= 3:
             penalty += 1.5
-        if dist_from_closest_mask == 0:
-            mask_reward /= 3
-        elif dist_from_closest_mask <= 2:
-            mask_reward /= 2
-        elif dist_from_closest_mask == 3:
-            mask_reward /= 1.25
+    # if dist_from_closest_mask == 0:
+    #     mask_reward /= 3
+    # elif dist_from_closest_mask <= 2:
+    #     mask_reward /= 2
+    # elif dist_from_closest_mask == 3:
+    #     mask_reward /= 1.25
     if distance_from_target == 0:
         return -1000000
     return (distance_from_target * 8 * penalty * mask_reward) + (distance_from_beginning * 1) + (

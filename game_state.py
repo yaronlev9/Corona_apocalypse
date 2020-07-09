@@ -1,6 +1,7 @@
 from enum import Enum
 from copy import deepcopy
 
+
 class Action(Enum):
     UP = "UP"
     DOWN = "DOWN"
@@ -23,21 +24,23 @@ TARGET = 'W'
 
 class GameState(object):
     def __init__(self, width=WIDTH, height=HEIGHT, corona_1_loc=(7, 2),
-                 corona_2_loc=(13, 0), corona_3_loc=(7, 8), location=(0, WIDTH - 1), board=None, mask=False):
+                 corona_2_loc=(13, 0), corona_3_loc=(7, 8), location=(0, WIDTH - 1), board=None, mask=False,
+                 mask_locations=[(6, 0), (7, 15)]):
         self.__width = width
         self.__height = height
         self.__score = START_SCORE
         self.__corona_1_location = corona_1_loc
         self.__corona_2_location = corona_2_loc
         self.__corona_3_location = corona_3_loc
-        self.__mask_locations = [(6, 0), (7, 15)]
+        self.__mask_locations = mask_locations
         self.__location = location
         self.__board = self.create_board()
         self.__target = (self.__height - 1, 0)
         self.__done = False
-        self.__mask = False
+        self.__mask = mask
         self.__win = False
         self.dict_of_moves = {Action.UP: False, Action.DOWN: False, Action.RIGHT: False, Action.LEFT: False}
+        # self.__first_mask = first_mask
 
     def create_board(self):
         board = [
@@ -237,7 +240,7 @@ class GameState(object):
                               corona_2_loc=self.__corona_2_location,
                               corona_3_loc=self.__corona_3_location,
                               location=self.__location,
-                              board=self.__board.copy())
+                              board=self.__board.copy(), mask=self.__mask, mask_locations=self.__mask_locations)
         successor.apply_action(action, player)
         return successor
 
@@ -278,3 +281,9 @@ class GameState(object):
 
     def get_win(self):
         return self.__win
+
+    # def get_first_mask(self):
+    #     return self.__first_mask
+    #
+    # def set_first_mask(self, value):
+    #     self.__first_mask = value
