@@ -44,7 +44,6 @@ class ExpectimaxAgent(Agent):
             lst = [(self.expectimax_helper(current_depth, successor[0], 1)[0],
                     successor[1]) for
                    successor in successors]
-            # print(lst)
             lst = sorted(lst, key=itemgetter(0))
             return lst[0]
         else:
@@ -75,16 +74,40 @@ def evaluation_function(current_game_state):
                                                 current_game_state.get_location())
     distance_from_corona_2 = manhattan_distance(current_game_state.get_corona_2_location(),
                                                 current_game_state.get_location())
+    distance_from_corona_3 = manhattan_distance(current_game_state.get_corona_3_location(),
+                                                current_game_state.get_location())
     dist_from_mask_1 = pitagoras(current_game_state.get_mask_locations()[0],
                                  current_game_state.get_location())
     dist_from_mask_2 = pitagoras(current_game_state.get_mask_locations()[1],
                                  current_game_state.get_location())
     dist_from_closest_mask = min([dist_from_mask_1, dist_from_mask_2])
-    if current_game_state.get_mask_status():
-        if distance_from_target == 0:
-            return -1000000
-        return (distance_from_target * 8) + (distance_from_beginning * 1) + (2 * current_game_state.get_score())
-    return (dist_from_closest_mask * 11) + (distance_from_target * 5) - (distance_from_beginning * 5)
+    # if current_game_state.get_mask_status():
+    penalty = 1
+    mask_reward = 1
+    if not current_game_state.get_mask_status():
+        if distance_from_corona_1 <= 2:
+            penalty += 1.5
+        elif distance_from_corona_1 <= 3:
+            penalty += 1
+        if distance_from_corona_2 <= 2:
+            penalty += 1.5
+        elif distance_from_corona_2 <= 3:
+            penalty += 1
+        if distance_from_corona_3 <= 2:
+            penalty += 1.5
+        elif distance_from_corona_3 <= 3:
+            penalty += 1.5
+        if dist_from_closest_mask == 0:
+            mask_reward /= 3
+        elif dist_from_closest_mask <= 2:
+            mask_reward /= 2
+        elif dist_from_closest_mask == 3:
+            mask_reward /= 1.25
+    if distance_from_target == 0:
+        return -1000000
+    return (distance_from_target * 8 * penalty * mask_reward) + (distance_from_beginning * 1) + (
+            2 * current_game_state.get_score())
+    # return (dist_from_closest_mask * 11) + (distance_from_target * 5) - (distance_from_beginning * 5)
 
 
 def pitagoras(xy1, xy2):

@@ -23,7 +23,7 @@ TARGET = 'W'
 
 class GameState(object):
     def __init__(self, width=WIDTH, height=HEIGHT, corona_1_loc=(7, 2),
-                 corona_2_loc=(13, 0), corona_3_loc=(7, 13), location=(0, WIDTH - 1), board=None):
+                 corona_2_loc=(13, 0), corona_3_loc=(7, 8), location=(0, WIDTH - 1), board=None, mask=False):
         self.__width = width
         self.__height = height
         self.__score = START_SCORE
@@ -94,7 +94,7 @@ class GameState(object):
             if self.__mask:
                 if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2' \
                         or self.__board[location[0]][location[1]] == '3':
-                    if location[1] - 1 < 0 or self.__board[location[0]][location[1] * 1] != '_':
+                    if location[1] - 1 < 0 or self.__board[location[0]][location[1] - 1] != '_':
                         return False
                     self.dict_of_moves[Action.LEFT] = True
                     return True
@@ -113,7 +113,7 @@ class GameState(object):
             if self.__mask:
                 if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2' \
                         or self.__board[location[0]][location[1]] == '3':
-                    if location[0] - 1 < 0 or self.__board[location[0] * 1][location[1]] != '_':
+                    if location[0] - 1 < 0 or self.__board[location[0] - 1][location[1]] != '_':
                         return False
                     self.dict_of_moves[Action.UP] = True
                     return True
@@ -206,9 +206,12 @@ class GameState(object):
             self.__location = new_location
             if self.__board[new_location[0]][new_location[1]] == 'm':
                 self.__mask = True
+                self.__mask_locations.remove(new_location)
+                self.__board[new_location[0]][new_location[1]] = EMPTY_LOCATION
             self.__board[new_location[0]][new_location[1]] = '0'
             if new_location == self.__target:
                 self.__win = True
+                self.__done = True
         elif player == 1:
             self.__corona_1_location = new_location
             if self.__board[new_location[0]][new_location[1]] == '0' and not self.__mask:
