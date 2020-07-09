@@ -70,51 +70,83 @@ def evaluation_function(current_game_state):
     target = current_game_state.get_target()
     distance_from_target = pitagoras(target, current_game_state.get_location())
     distance_from_beginning = pitagoras(current_game_state.get_location(), (0, 15))
-    distance_from_corona_1 = manhattan_distance(current_game_state.get_corona_1_location(),
-                                                current_game_state.get_location())
-    distance_from_corona_2 = manhattan_distance(current_game_state.get_corona_2_location(),
-                                                current_game_state.get_location())
-    distance_from_corona_3 = manhattan_distance(current_game_state.get_corona_3_location(),
-                                                current_game_state.get_location())
-    dist_from_mask_1 = 4
-    dist_from_mask_2 = 4
     if len(current_game_state.get_mask_locations()) >= 1:
         dist_from_mask_1 = pitagoras(current_game_state.get_mask_locations()[0],
                                      current_game_state.get_location())
     if len(current_game_state.get_mask_locations()) >= 2:
         dist_from_mask_2 = pitagoras(current_game_state.get_mask_locations()[1],
                                      current_game_state.get_location())
-    dist_from_closest_mask = min([dist_from_mask_1, dist_from_mask_2])
     # if current_game_state.get_mask_status():
-    # if current_game_state.get_mask_status() and current_game_state.get_first_mask():
-    #     current_game_state.set_first_mask(False)
-    #     return -100000
-    penalty = 1
-    mask_reward = 1
-    if not current_game_state.get_mask_status():
-        if distance_from_corona_1 <= 2:
-            penalty += 1.5
-        elif distance_from_corona_1 <= 3:
-            penalty += 1
-        if distance_from_corona_2 <= 2:
-            penalty += 1.5
-        elif distance_from_corona_2 <= 3:
-            penalty += 1
-        if distance_from_corona_3 <= 2:
-            penalty += 1.5
-        elif distance_from_corona_3 <= 3:
-            penalty += 1.5
-    # if dist_from_closest_mask == 0:
-    #     mask_reward /= 3
-    # elif dist_from_closest_mask <= 2:
-    #     mask_reward /= 2
-    # elif dist_from_closest_mask == 3:
-    #     mask_reward /= 1.25
+    if current_game_state.get_mask_status() and current_game_state.get_first_mask():
+        current_game_state.set_first_mask(False)
+        return -1000000
+    penalty = get_corona_penalty(current_game_state, board)
+    mask_reward = get_mask_reward()
     if distance_from_target == 0:
         return -1000000
     return (distance_from_target * 8 * penalty * mask_reward) + (distance_from_beginning * 1) + (
             2 * current_game_state.get_score())
     # return (dist_from_closest_mask * 11) + (distance_from_target * 5) - (distance_from_beginning * 5)
+
+
+def wall_between_points(first_point, second_point, board):
+    horizontal_dist = abs(first_point[1] - second_point[1])
+    vertical_dist = abs(first_point[0] - second_point[0])
+    min_horizontal = min(first_point[1], second_point[1])
+    min_vertical = min(first_point[0], second_point[0])
+    for j in range(vertical_dist + 1):
+        for i in range(horizontal_dist - 1):
+            if board[min_vertical + j][min_horizontal + i + 1] == '*':
+                return True
+    for i in range(horizontal_dist + 1):
+        for j in range(vertical_dist - 1):
+            if board[min_vertical + j + 1][min_horizontal + i] == '*':
+                return True
+    return False
+
+
+def get_mask_reward():
+    dist_from_mask_1 = 4
+    dist_from_mask_2 = 4
+    mask_reward = 1
+    dist_from_closest_mask = min([dist_from_mask_1, dist_from_mask_2])
+    if dist_from_closest_mask == 0:
+        mask_reward /= 3
+    elif dist_from_closest_mask <= 2:
+        mask_reward /= 2
+    elif dist_from_closest_mask == 3:
+        mask_reward /= 1.25
+    return mask_reward
+
+
+def get_corona_penalty(current_game_state, board):
+    penalty = 1
+    distance_from_corona_1 = manhattan_distance(current_game_state.get_corona_1_location(),
+                                                current_game_state.get_location())
+    distance_from_corona_2 = manhattan_distance(current_game_state.get_corona_2_location(),
+                                                current_game_state.get_location())
+    distance_from_corona_3 = manhattan_distance(current_game_state.get_corona_3_location(),
+                                                current_game_state.get_location())
+    if not current_game_state.get_mask_status():
+        if not wall_between_points(current_game_state.get_location(),
+                                   current_game_state.get_corona_1_location(), board):
+            if distance_from_corona_1 <= 2:
+                penalty += 1.5
+            elif distance_from_corona_1 <= 3:
+                penalty += 1
+        if not wall_between_points(current_game_state.get_location(),
+                                   current_game_state.get_corona_2_location(), board):
+            if distance_from_corona_2 <= 2:
+                penalty += 1.5
+            elif distance_from_corona_2 <= 3:
+                penalty += 1
+        if not wall_between_points(current_game_state.get_location(),
+                                   current_game_state.get_corona_3_location(), board):
+            if distance_from_corona_3 <= 2:
+                penalty += 1.5
+            elif distance_from_corona_3 <= 3:
+                penalty += 1.5
+    return penalty
 
 
 def pitagoras(xy1, xy2):

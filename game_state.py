@@ -25,7 +25,7 @@ TARGET = 'W'
 class GameState(object):
     def __init__(self, width=WIDTH, height=HEIGHT, corona_1_loc=(7, 2),
                  corona_2_loc=(13, 0), corona_3_loc=(7, 8), location=(0, WIDTH - 1), board=None, mask=False,
-                 mask_locations=[(6, 0), (7, 15)]):
+                 mask_locations=[(6, 0), (7, 15)], first_mask=True):
         self.__width = width
         self.__height = height
         self.__score = START_SCORE
@@ -40,7 +40,7 @@ class GameState(object):
         self.__mask = mask
         self.__win = False
         self.dict_of_moves = {Action.UP: False, Action.DOWN: False, Action.RIGHT: False, Action.LEFT: False}
-        # self.__first_mask = first_mask
+        self.__first_mask = first_mask
 
     def create_board(self):
         board = [
@@ -208,7 +208,7 @@ class GameState(object):
             if action != Action.STOP:
                 self.__score -= 1
             self.__location = new_location
-            if self.__board[new_location[0]][new_location[1]] == 'm':
+            if self.__board[new_location[0]][new_location[1]] == 'm' and new_location in self.__mask_locations:
                 self.__mask = True
                 self.__mask_locations.remove(new_location)
                 self.__board[new_location[0]][new_location[1]] = EMPTY_LOCATION
@@ -240,7 +240,8 @@ class GameState(object):
                               corona_2_loc=self.__corona_2_location,
                               corona_3_loc=self.__corona_3_location,
                               location=self.__location,
-                              board=self.__board.copy(), mask=self.__mask, mask_locations=self.__mask_locations)
+                              board=self.__board.copy(), mask=self.__mask, mask_locations=self.__mask_locations,
+                              first_mask=self.__first_mask)
         successor.apply_action(action, player)
         return successor
 
@@ -282,8 +283,8 @@ class GameState(object):
     def get_win(self):
         return self.__win
 
-    # def get_first_mask(self):
-    #     return self.__first_mask
-    #
-    # def set_first_mask(self, value):
-    #     self.__first_mask = value
+    def get_first_mask(self):
+        return self.__first_mask
+
+    def set_first_mask(self, value):
+        self.__first_mask = value
