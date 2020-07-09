@@ -12,7 +12,6 @@ class Game(object):
         self._should_quit = False
 
     def run(self, initial_state):
-        self.display.draw_state(initial_state.get_board())
         self.display.root.update()
         self._should_quit = False
         self._state = initial_state
@@ -31,11 +30,13 @@ class Game(object):
             self._state.apply_action(opponent_action2, 2)
             opponent_action3 = random.choice(self._state.get_legal_actions(3))
             self._state.apply_action(opponent_action3, 3)
-            self.display.draw_state(self._state.get_board())
+            self.display.draw_state(self._state)
             self.display.root.update()
+
+
 if __name__ == '__main__':
     ga = game_state.GameState()
-    #agent = multi_agents.MonteCarloTreeSearchAgent(500)
-    agent = multi_agents.ExpectimaxAgent(2)
+    agent = multi_agents.MonteCarloTreeSearchAgent(100)
+    #agent = multi_agents.ExpectimaxAgent(2)
     t = Game(agent, GUI.Display(ga))
     t.run(ga)

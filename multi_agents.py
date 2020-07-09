@@ -4,6 +4,7 @@ import random
 import game_state
 from operator import itemgetter
 
+
 class Agent(object):
     def __init__(self):
         super(Agent, self).__init__()
@@ -14,6 +15,7 @@ class Agent(object):
 
     def stop_running(self):
         pass
+
 
 class ExpectimaxAgent(Agent):
     def __init__(self, depth):
@@ -93,21 +95,16 @@ def manhattan_distance(xy1, xy2):
     "Returns the Manhattan distance between points xy1 and xy2"
     return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
 
-# ga = game_state.GameState()
-# t = ExpectimaxAgent(1)
-# print(t.get_action(ga))
 
 class Node:
     def __init__(self, state, player, parent):
         self.counter = 0
         self.wins = 0
-        self.loses = 0
         self.state = state
         self.player = player
         self.parent = parent
-        self.score = 0
         self.simulations_counter = 0
-        self.expanded = False
+
 
 class MonteCarloTreeSearchAgent(Agent):
 
@@ -124,12 +121,11 @@ class MonteCarloTreeSearchAgent(Agent):
         self.monte_carlo_tree_search(self.root, 0)
         return self.best_child()[1]
 
-
     def monte_carlo_tree_search(self, state, player):
+        leafs = []
         cur_state = state
         board_state = state.state
         while self.num_simulations < self.max_simulations:
-            leafs = []
             player = cur_state.player
             if player == 0:
                 for action in board_state.get_legal_actions(0):
@@ -154,7 +150,7 @@ class MonteCarloTreeSearchAgent(Agent):
                         if self.num_simulations == self.max_simulations:
                             return
             cur_state = random.choice(leafs)
-
+            leafs.remove(cur_state)
 
     def back_propagate(self, node, result):
         while node.parent != None:
@@ -165,11 +161,10 @@ class MonteCarloTreeSearchAgent(Agent):
             node.simulations_counter += 1
             node = node.parent
 
-
     def run_simulation(self, state):
         board_state = state.state
         if state.player == 0:
-            for i in range(1000):
+            for i in range(500):
                 board_state = board_state.generate_successor(0, random.choice(board_state.get_legal_actions(0)))
                 board_state = board_state.generate_successor(1, random.choice(board_state.get_legal_actions(1)))
                 board_state = board_state.generate_successor(2, random.choice(board_state.get_legal_actions(2)))
@@ -179,7 +174,7 @@ class MonteCarloTreeSearchAgent(Agent):
                     return 1
             return 1
         elif state.player == 1:
-            for i in range(1000):
+            for i in range(500):
                 board_state = board_state.generate_successor(1, random.choice(board_state.get_legal_actions(1)))
                 board_state = board_state.generate_successor(2, random.choice(board_state.get_legal_actions(2)))
                 board_state = board_state.generate_successor(0, random.choice(board_state.get_legal_actions(0)))
@@ -200,7 +195,6 @@ class MonteCarloTreeSearchAgent(Agent):
         return best_state
 
     def calculate_score(self, state):
-        score = (state.wins/state.simulations_counter) + \
-        self.exploration_param * math.sqrt(math.log((self.num_simulations), math.e)/state.simulations_counter)
-        print(score)
+        score = (state.wins / state.simulations_counter) + \
+                self.exploration_param * math.sqrt(math.log((self.num_simulations), math.e) / state.simulations_counter)
         return score

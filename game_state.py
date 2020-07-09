@@ -85,7 +85,7 @@ class GameState(object):
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
         return self.__board[location[0]][location[1]] == '_' or (
-                    self.__board[location[0]][location[1]] == '0' and not self.__mask)
+                self.__board[location[0]][location[1]] == '0' and not self.__mask)
 
     def _is_left_legal_action(self, location, player):
         if location[1] < 0:
@@ -104,7 +104,7 @@ class GameState(object):
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
         return self.__board[location[0]][location[1]] == '_' or (
-                    self.__board[location[0]][location[1]] == '0' and not self.__mask)
+                self.__board[location[0]][location[1]] == '0' and not self.__mask)
 
     def _is_up_legal_action(self, location, player):
         if location[0] < 0:
@@ -123,7 +123,7 @@ class GameState(object):
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
         return self.__board[location[0]][location[1]] == '_' or (
-                    self.__board[location[0]][location[1]] == '0' and not self.__mask)
+                self.__board[location[0]][location[1]] == '0' and not self.__mask)
 
     def _is_down_legal_action(self, location, player):
         if location[0] >= self.__height:
@@ -142,7 +142,7 @@ class GameState(object):
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
         return self.__board[location[0]][location[1]] == '_' or (
-                    self.__board[location[0]][location[1]] == '0' and not self.__mask)
+                self.__board[location[0]][location[1]] == '0' and not self.__mask)
 
     def get_legal_actions(self, player):
         legal_actions = []

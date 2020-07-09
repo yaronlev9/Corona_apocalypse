@@ -25,9 +25,10 @@ class Display:
         self.player_img = tk.PhotoImage(file="images//doctor.png")
         self.corona_img = tk.PhotoImage(file="images//corona.png")
         self.mask_img = tk.PhotoImage(file="images//mask.png")
-        self.label_dict = dict()
+        self.locations_dict = dict()
+        self.masks_labels = dict()
+        self.masks = initial_board.get_mask_locations().copy()
         self.create_board(initial_board)
-        self.locations_dict = {}
 
     def create_board(self, initial_board):
         """
@@ -45,27 +46,35 @@ class Display:
                 self.canvas_list[row_index][col_index].grid(row=row_index, column=col_index)
                 if (row_index, col_index) == initial_board.get_target():
                     tk.Label(self.root, image=self.finish_img).grid(row=row_index, column=col_index)
+        for mask in self.masks:
+            label = tk.Label(self.root, image=self.mask_img)
+            label.grid(row=mask[0], column=mask[1])
+            self.masks_labels[mask] = label
+        self.make_players(initial_board)
 
-    def make_label(self, row_index, col_index, image):
+    def make_players(self, initial_board):
+        self.make_label("player", initial_board.get_location(), self.player_img)
+        self.make_label("corona1", initial_board.get_corona_1_location(), self.corona_img)
+        self.make_label("corona2", initial_board.get_corona_2_location(), self.corona_img)
+        self.make_label("corona3", initial_board.get_corona_3_location(), self.corona_img)
+
+    def make_label(self, string, location, image):
         label = tk.Label(self.root, image=image)
-        label.grid(row=row_index, column=col_index)
-        self.label_dict[(row_index, col_index)] = label
+        label.grid(row=location[0], column=location[1])
+        self.locations_dict[string] = label
+
+    def change_pos(self, string, location):
+        for mask in self.masks_labels.keys():
+            if self.masks_labels[mask] != None and \
+                    string == "player" and mask[0] == location[0] and mask[1] == location[1]:
+                self.masks_labels[mask].destroy()
+        self.locations_dict[string].grid(row=location[0], column=location[1])
 
     def draw_state(self, state):
         """
         draws a given state on the gui board.
         """
-        for row_index in range(len(state)):
-            for col_index in range(len(state[row_index])):
-                if (row_index, col_index) in self.label_dict:
-                    self.label_dict[(row_index, col_index)].destroy()
-                    self.label_dict.pop((row_index, col_index))
-                if (15, 0) in self.label_dict:
-                    tk.Label(self.root, image=self.finish_img).grid(row=15, column=0)
-                    self.label_dict.pop((15, 0))
-                if state[row_index][col_index] == CORONA_ILL_1 or state[row_index][col_index] == CORONA_ILL_2 or state[row_index][col_index] == CORONA_ILL_3:
-                    self.make_label(row_index, col_index, self.corona_img)
-                elif state[row_index][col_index] == CITIZEN:
-                    self.make_label(row_index, col_index, self.player_img)
-                elif state[row_index][col_index] == MASK:
-                    self.make_label(row_index, col_index, self.mask_img)
+        self.change_pos("player", state.get_location())
+        self.change_pos("corona1", state.get_corona_1_location())
+        self.change_pos("corona2", state.get_corona_2_location())
+        self.change_pos("corona3", state.get_corona_3_location())
