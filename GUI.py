@@ -53,7 +53,7 @@ class Display:
         self.make_label("player", initial_board.get_location(), self.player_img)
         counter = 1
         for corona in initial_board.get_coronas():
-            name = "corona"+str(counter)
+            name = "corona" + str(counter)
             self.make_label(name, corona, self.corona_img)
             counter += 1
 
