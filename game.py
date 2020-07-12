@@ -27,11 +27,23 @@ class Game(object):
             # print("action = ", action)
             # print("state = \n", self._state)
             # print("mask state = ", self._state.get_mask_status())
-            opponent_action1 = random.choice(self._state.get_legal_actions(1))
+            opponent_action1_lst = self._state.get_legal_actions(1)
+            if len(opponent_action1_lst) == 0:
+                opponent_action1 = game_state.Action.STOP
+            else:
+                opponent_action1 = random.choice(opponent_action1_lst)
             self._state.apply_action(opponent_action1, 1)
-            opponent_action2 = random.choice(self._state.get_legal_actions(2))
+            opponent_action2_lst = self._state.get_legal_actions(2)
+            if len(opponent_action2_lst) == 0:
+                opponent_action2 = game_state.Action.STOP
+            else:
+                opponent_action2 = random.choice(opponent_action2_lst)
             self._state.apply_action(opponent_action2, 2)
-            opponent_action3 = random.choice(self._state.get_legal_actions(3))
+            opponent_action3_lst = self._state.get_legal_actions(3)
+            if len(opponent_action3_lst) == 0:
+                opponent_action3 = game_state.Action.STOP
+            else:
+                opponent_action3 = random.choice(opponent_action3_lst)
             self._state.apply_action(opponent_action3, 3)
             self.display.draw_state(self._state)
             self.display.root.update()
@@ -39,7 +51,7 @@ class Game(object):
 
 if __name__ == '__main__':
     ga = game_state.GameState()
-    # agent = multi_agents.MonteCarloTreeSearchAgent(100)
-    agent = multi_agents.ExpectimaxAgent(2)
+    agent = multi_agents.MonteCarloTreeSearchAgent(100)
+    # agent = multi_agents.ExpectimaxAgent(2)
     t = Game(agent, GUI.Display(ga))
     t.run(ga)

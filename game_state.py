@@ -168,7 +168,7 @@ class GameState(object):
             legal_actions.append(Action.UP)
         if self._is_down_legal_action((location[0] + 1, location[1]), player):
             legal_actions.append(Action.DOWN)
-        legal_actions.append(Action.STOP)
+        # legal_actions.append(Action.STOP)
         return legal_actions
 
     def apply_action(self, action, player):
@@ -240,7 +240,8 @@ class GameState(object):
                               corona_2_loc=self.__corona_2_location,
                               corona_3_loc=self.__corona_3_location,
                               location=self.__location,
-                              board=self.__board.copy(), mask=self.__mask, mask_locations=self.__mask_locations,
+                              board=self.__board.copy(), mask=self.__mask,
+                              mask_locations=deepcopy(self.__mask_locations),
                               first_mask=self.__first_mask)
         successor.apply_action(action, player)
         return successor
