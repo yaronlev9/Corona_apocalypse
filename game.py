@@ -3,6 +3,63 @@ import multi_agents
 import random
 import GUI
 
+BOARD_16 =[
+            ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_'],
+            ['*', '*', '*', '_', '*', '*', '*', '*', '*', '*', '*', '*', '*', '_', '_', '*'],
+            ['*', '_', '_', '_', '*', '*', '*', '*', '*', '*', '*', '*', '*', '_', '_', '*'],
+            ['*', '*', '*', '_', '*', '*', '*', '_', '_', '_', '_', '_', '_', '_', '_', '*'],
+            ['_', '_', '_', '_', '_', '_', '_', '_', '*', '*', '*', '_', '*', '_', '_', '*'],
+            ['_', '*', '*', '_', '_', '*', '*', '*', '*', '_', '_', '_', '*', '_', '_', '*'],
+            ['_', '*', '_', '_', '_', '*', '_', '_', '_', '_', '_', '_', '*', '_', '_', '*'],
+            ['*', '*', '_', '_', '*', '*', '_', '_', '_', '_', '*', '_', '_', '_', '_', '_'],
+            ['_', '_', '_', '_', '*', '_', '_', '*', '*', '*', '*', '*', '*', '_', '*', '*'],
+            ['_', '_', '_', '*', '*', '_', '_', '_', '_', '_', '_', '_', '*', '_', '*', '*'],
+            ['_', '_', '_', '_', '_', '_', '*', '_', '*', '_', '*', '*', '*', '_', '*', '*'],
+            ['*', '*', '*', '_', '*', '_', '*', '_', '*', '_', '_', '_', '_', '_', '_', '_'],
+            ['_', '_', '_', '_', '*', '_', '_', '_', '*', '_', '*', '*', '*', '_', '_', '*'],
+            ['_', '_', '_', '_', '*', '_', '_', '_', '*', '_', '_', '_', '*', '_', '_', '*'],
+            ['_', '*', '_', '*', '*', '_', '*', '_', '*', '*', '*', '*', '*', '_', '*', '*'],
+            ['_', '_', '_', '_', '_', '_', '*', '_', '_', '_', '_', '_', '_', '_', '*', '*']]
+
+BOARD_12 = [
+            ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_'],
+            ['*', '_', '_', '_', '*', '*', '*', '*', '_', '_', '_', '_'],
+            ['*', '*', '_', '_', '_', '_', '*', '*', '_', '*', '*', '_'],
+            ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '*', '_'],
+            ['_', '_', '_', '_', '_', '_', '_', '_', '_', '*', '*', '_'],
+            ['_', '_', '_', '*', '*', '_', '*', '*', '_', '_', '_', '_'],
+            ['*', '_', '*', '*', '_', '_', '_', '_', '_', '_', '_', '_'],
+            ['*', '_', '*', '_', '_', '_', '_', '_', '_', '_', '_', '_'],
+            ['*', '_', '_', '_', '_', '_', '_', '_', '*', '*', '_', '_'],
+            ['_', '_', '_', '_', '_', '*', '_', '*', '*', '_', '_', '*'],
+            ['_', '_', '*', '_', '_', '*', '_', '*', '*', '_', '_', '*'],
+            ['_', '_', '*', '_', '_', '_', '_', '_', '_', '_', '_', '*']]
+
+BOARD_8 = [
+            ['_', '_', '_', '_'],
+            ['_', '*', '_', '_'],
+            ['_', '_', '_', '_'],
+            ['_', '_', '_', '_']]
+
+BOARD_4 = [
+            ['_', '_', '_', '_'],
+            ['_', '*', '_', '_'],
+            ['_', '_', '_', '_'],
+            ['_', '_', '_', '_']]
+
+# TARGET
+# MASKS
+# CORONAS
+# WIDTH
+# HEIGHT
+# PLAYER
+# TARGET
+# BOARD
+
+CORONA_4 = [(11,0), [(5, 4), (3,9)],[(0,0), (8,2)], 4, 4, (0,11), BOARD_4]
+CORONA_8 = [(11,0), [(5, 4), (3,9)],[(0,0), (8,2)], 8, 8, (0,11), BOARD_8]
+CORONA_12 = [(11,0), [(5, 4), (3,9)],[(0,0), (8,2)], 12, 12, (0,11), BOARD_12]
+CORONA_16 = [(11,0), [(5, 4), (3,9)],[(0,0), (8,2)], 16, 16, (0,11), BOARD_16]
 
 class Game(object):
     def __init__(self, agent, display):
@@ -15,43 +72,31 @@ class Game(object):
         self.display.root.update()
         self._should_quit = False
         self._state = initial_state
-        return self._game_loop()
+        return self._game_loop(initial_state)
 
     def quit(self):
         self._should_quit = True
 
-    def _game_loop(self):
+    def _game_loop(self, initial_state):
         while not self._state.get_done() and not self._should_quit:
             action = self.agent.get_action(self._state)
             self._state.apply_action(action, 0)
-            # print("action = ", action)
-            # print("state = \n", self._state)
-            # print("mask state = ", self._state.get_mask_status())
-            opponent_action1_lst = self._state.get_legal_actions(1)
-            if len(opponent_action1_lst) == 0:
-                opponent_action1 = game_state.Action.STOP
-            else:
-                opponent_action1 = random.choice(opponent_action1_lst)
-            self._state.apply_action(opponent_action1, 1)
-            opponent_action2_lst = self._state.get_legal_actions(2)
-            if len(opponent_action2_lst) == 0:
-                opponent_action2 = game_state.Action.STOP
-            else:
-                opponent_action2 = random.choice(opponent_action2_lst)
-            self._state.apply_action(opponent_action2, 2)
-            opponent_action3_lst = self._state.get_legal_actions(3)
-            if len(opponent_action3_lst) == 0:
-                opponent_action3 = game_state.Action.STOP
-            else:
-                opponent_action3 = random.choice(opponent_action3_lst)
-            self._state.apply_action(opponent_action3, 3)
+            if self._state.get_win():
+                break
+            for corona in range(len(initial_state.get_coronas())):
+                opponent_action = random.choice(self._state.get_legal_actions(corona + 1))
+                self._state.apply_action(opponent_action, corona + 1)
             self.display.draw_state(self._state)
             self.display.root.update()
+        if self._state.get_win():
+            print("you won!!!")
+        else:
+            print("you lose :(")
 
 
 if __name__ == '__main__':
-    ga = game_state.GameState()
-    agent = multi_agents.MonteCarloTreeSearchAgent(100)
-    # agent = multi_agents.ExpectimaxAgent(2)
+    ga = game_state.GameState(CORONA_12[0], CORONA_12[1], CORONA_12[2], CORONA_12[3], CORONA_12[4], CORONA_12[5], CORONA_12[6])
+    #agent = multi_agents.MonteCarloTreeSearchAgent(150)
+    agent = multi_agents.ExpectimaxAgent(2)
     t = Game(agent, GUI.Display(ga))
     t.run(ga)

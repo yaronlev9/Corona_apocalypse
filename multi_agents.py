@@ -100,7 +100,7 @@ class ExpectimaxAgent(Agent):
         #     print("left = ", res)
         # elif current_game_state.get_location() == (10, 7):
         #     print("down = ", res)
-        return distance_from_target * corona_penalty + walls_penalty
+        return distance_from_target * corona_penalty * walls_penalty
         # return (dist_from_closest_mask * 11) + (distance_from_target * 5) - (distance_from_beginning * 5)
 
 
