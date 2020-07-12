@@ -1,9 +1,6 @@
 import tkinter as tk
 
 SQUARE_SIZE = 37
-
-WIDTH = 16
-HEIGHT = 16
 START_SCORE = 0
 CITIZEN = '0'
 CORONA_ILL_1 = '1'
@@ -34,9 +31,9 @@ class Display:
         """
         creates a new board gui with a given initial board.
         """
-        for row_index in range(WIDTH):
+        for row_index in range(initial_board.get_width()):
             self.canvas_list.append([])
-            for col_index in range(HEIGHT):
+            for col_index in range(initial_board.get_width()):
                 if initial_board.get_board()[row_index][col_index] == WALL:
                     self.canvas_list[row_index].append(
                         tk.Canvas(self.root, bg='gray30', width=SQUARE_SIZE, height=SQUARE_SIZE))
@@ -54,9 +51,11 @@ class Display:
 
     def make_players(self, initial_board):
         self.make_label("player", initial_board.get_location(), self.player_img)
-        self.make_label("corona1", initial_board.get_corona_1_location(), self.corona_img)
-        self.make_label("corona2", initial_board.get_corona_2_location(), self.corona_img)
-        self.make_label("corona3", initial_board.get_corona_3_location(), self.corona_img)
+        counter = 1
+        for corona in initial_board.get_coronas():
+            name = "corona"+str(counter)
+            self.make_label(name, corona, self.corona_img)
+            counter += 1
 
     def make_label(self, string, location, image):
         label = tk.Label(self.root, image=image)
@@ -75,6 +74,8 @@ class Display:
         draws a given state on the gui board.
         """
         self.change_pos("player", state.get_location())
-        self.change_pos("corona1", state.get_corona_1_location())
-        self.change_pos("corona2", state.get_corona_2_location())
-        self.change_pos("corona3", state.get_corona_3_location())
+        counter = 1
+        for corona in state.get_coronas():
+            name = "corona" + str(counter)
+            self.change_pos(name, corona)
+            counter += 1
