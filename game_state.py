@@ -10,39 +10,66 @@ class Action(Enum):
     STOP = "STOP"
 
 
+WIDTH = 16
+HEIGHT = 16
 START_SCORE = 0
 CITIZEN = '0'
+CORONA_ILL_1 = '1'
+CORONA_ILL_2 = '2'
+CORONA_ILL_3 = '3'
 WALL = '*'
 EMPTY_LOCATION = '_'
 TARGET = 'W'
 
+
 class GameState(object):
-    def __init__(self, target, mask_locations, coronas, width, height, location, board=None, mask=False, first_mask=True):
+    def __init__(self, width=WIDTH, height=HEIGHT, corona_1_loc=(7, 2),
+                 corona_2_loc=(13, 0), corona_3_loc=(7, 8), location=(0, WIDTH - 1), board=None, mask=False,
+                 mask_locations=[(6, 0), (7, 15)], first_mask=True):
         self.__width = width
         self.__height = height
         self.__score = START_SCORE
-        self.__coronas = coronas
+        self.__corona_1_location = corona_1_loc
+        self.__corona_2_location = corona_2_loc
+        self.__corona_3_location = corona_3_loc
         self.__mask_locations = mask_locations
         self.__location = location
-        self.__board = self.create_board(board)
-        self.__target = target
+        self.__board = self.create_board()
+        self.__target = (self.__height - 1, 0)
         self.__done = False
         self.__mask = mask
         self.__win = False
         self.dict_of_moves = {Action.UP: False, Action.DOWN: False, Action.RIGHT: False, Action.LEFT: False}
         self.__first_mask = first_mask
 
-    def create_board(self, draft_board):
-        board = draft_board
-        counter = 1
+    def create_board(self):
+        board = [
+            ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_'],
+            ['*', '*', '*', '_', '*', '*', '*', '*', '*', '*', '*', '*', '*', '_', '_', '*'],
+            ['*', '_', '_', '_', '*', '*', '*', '*', '*', '*', '*', '*', '*', '_', '_', '*'],
+            ['*', '*', '*', '_', '*', '*', '*', '_', '_', '_', '_', '_', '_', '_', '_', '*'],
+            ['_', '_', '_', '_', '_', '_', '_', '_', '*', '*', '*', '_', '*', '_', '_', '*'],
+            ['_', '*', '*', '_', '_', '*', '*', '*', '*', '_', '_', '_', '*', '_', '_', '*'],
+            ['_', '*', '_', '_', '_', '*', '_', '_', '_', '_', '_', '_', '*', '_', '_', '*'],
+            ['*', '*', '_', '_', '*', '*', '_', '_', '_', '_', '*', '_', '_', '_', '_', '_'],
+            ['_', '_', '_', '_', '*', '_', '_', '*', '*', '*', '*', '*', '*', '_', '*', '*'],
+            ['_', '_', '_', '*', '*', '_', '_', '_', '_', '_', '_', '_', '*', '_', '*', '*'],
+            ['_', '_', '_', '_', '_', '_', '*', '_', '*', '_', '*', '*', '*', '_', '*', '*'],
+            ['*', '*', '*', '_', '*', '_', '*', '_', '*', '_', '_', '_', '_', '_', '_', '_'],
+            ['_', '_', '_', '_', '*', '_', '_', '_', '*', '_', '*', '*', '*', '_', '_', '*'],
+            ['_', '_', '_', '_', '*', '_', '_', '_', '*', '_', '_', '_', '*', '_', '_', '*'],
+            ['_', '*', '_', '*', '*', '_', '*', '_', '*', '*', '*', '*', '*', '_', '*', '*'],
+            ['_', '_', '_', '_', '_', '_', '*', '_', '_', '_', '_', '_', '_', '_', '*', '*']]
+        if board[self.__corona_1_location[0]][self.__corona_1_location[1]] == '_':
+            board[self.__corona_1_location[0]][self.__corona_1_location[1]] = '1'
+        if board[self.__corona_2_location[0]][self.__corona_2_location[1]] == '_':
+            board[self.__corona_2_location[0]][self.__corona_2_location[1]] = '2'
+        if board[self.__corona_3_location[0]][self.__corona_3_location[1]] == '_':
+            board[self.__corona_3_location[0]][self.__corona_3_location[1]] = '3'
         board[self.__location[0]][self.__location[1]] = '0'
         for mask in self.__mask_locations:
             if board[mask[0]][mask[1]] == '_':
                 board[mask[0]][mask[1]] = 'm'
-        for corona in self.__coronas:
-            if board[corona[0]][corona[1]] == '_':
-                board[corona[0]][corona[1]] = str(counter)
-                counter += 1
         return board
 
     def _is_right_legal_action(self, location, player):
@@ -50,11 +77,8 @@ class GameState(object):
             return False
         if player == 0:
             if self.__mask:
-                flag = False
-                for corona in self.__coronas:
-                    if self.__board[location[0]][location[1]] == corona:
-                        flag = True
-                if flag:
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2' \
+                        or self.__board[location[0]][location[1]] == '3':
                     if location[1] + 1 >= self.__width or self.__board[location[0]][location[1] + 1] != '_':
                         return False
                     self.dict_of_moves[Action.RIGHT] = True
@@ -64,19 +88,16 @@ class GameState(object):
                         return True
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
-        return self.__board[location[0]][location[1]] == '_' or (self.__board[location[0]][location[1]] == '0'
-                                                                 and not self.__mask)
+        return self.__board[location[0]][location[1]] == '_' or (
+                self.__board[location[0]][location[1]] == '0' and not self.__mask)
 
     def _is_left_legal_action(self, location, player):
         if location[1] < 0:
             return False
         if player == 0:
             if self.__mask:
-                flag = False
-                for corona in self.__coronas:
-                    if self.__board[location[0]][location[1]] == corona:
-                        flag = True
-                if flag:
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2' \
+                        or self.__board[location[0]][location[1]] == '3':
                     if location[1] - 1 < 0 or self.__board[location[0]][location[1] - 1] != '_':
                         return False
                     self.dict_of_moves[Action.LEFT] = True
@@ -94,11 +115,8 @@ class GameState(object):
             return False
         if player == 0:
             if self.__mask:
-                flag = False
-                for corona in self.__coronas:
-                    if self.__board[location[0]][location[1]] == corona:
-                        flag = True
-                if flag:
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2' \
+                        or self.__board[location[0]][location[1]] == '3':
                     if location[0] - 1 < 0 or self.__board[location[0] - 1][location[1]] != '_':
                         return False
                     self.dict_of_moves[Action.UP] = True
@@ -116,11 +134,8 @@ class GameState(object):
             return False
         if player == 0:
             if self.__mask:
-                flag = False
-                for corona in self.__coronas:
-                    if self.__board[location[0]][location[1]] == corona:
-                        flag = True
-                if flag:
+                if self.__board[location[0]][location[1]] == '1' or self.__board[location[0]][location[1]] == '2' \
+                        or self.__board[location[0]][location[1]] == '3':
                     if location[0] + 1 >= self.__height or self.__board[location[0] + 1][location[1]] != '_':
                         return False
                     self.dict_of_moves[Action.DOWN] = True
@@ -137,8 +152,14 @@ class GameState(object):
         legal_actions = []
         if player == 0:
             location = self.__location
+        elif player == 1:
+            location = self.__corona_1_location
+        elif player == 2:
+            location = self.__corona_2_location
+        elif player == 3:
+            location = self.__corona_3_location
         else:
-            location = self.__coronas[player - 1]
+            raise Exception("Illegal agent index.")
         if self._is_right_legal_action((location[0], location[1] + 1), player):
             legal_actions.append(Action.RIGHT)
         if self._is_left_legal_action((location[0], location[1] - 1), player):
@@ -147,8 +168,7 @@ class GameState(object):
             legal_actions.append(Action.UP)
         if self._is_down_legal_action((location[0] + 1, location[1]), player):
             legal_actions.append(Action.DOWN)
-        if len(legal_actions) == 0:
-            legal_actions.append(Action.STOP)
+        # legal_actions.append(Action.STOP)
         return legal_actions
 
     def apply_action(self, action, player):
@@ -156,8 +176,12 @@ class GameState(object):
             return
         if player == 0:
             old_location = self.__location
+        elif player == 1:
+            old_location = self.__corona_1_location
+        elif player == 2:
+            old_location = self.__corona_2_location
         else:
-            old_location = self.__coronas[player - 1]
+            old_location = self.__corona_3_location
         if action == Action.UP:
             new_location = (old_location[0] - 1, old_location[1])
             if self.dict_of_moves[Action.UP]:
@@ -192,23 +216,32 @@ class GameState(object):
             if new_location == self.__target:
                 self.__win = True
                 self.__done = True
-        else:
-            self.__coronas[player - 1] = new_location
+        elif player == 1:
+            self.__corona_1_location = new_location
             if self.__board[new_location[0]][new_location[1]] == '0' and not self.__mask:
                 self.__done = True
-            self.__board[new_location[0]][new_location[1]] = str(player)
+            self.__board[new_location[0]][new_location[1]] = '1'
+        elif player == 2:
+            self.__corona_2_location = new_location
+            if self.__board[new_location[0]][new_location[1]] == '0' and not self.__mask:
+                self.__done = True
+            self.__board[new_location[0]][new_location[1]] = '2'
+        elif player == 3:
+            self.__corona_3_location = new_location
+            if self.__board[new_location[0]][new_location[1]] == '0' and not self.__mask:
+                self.__done = True
+            self.__board[new_location[0]][new_location[1]] = '3'
         for key in self.dict_of_moves:
             self.dict_of_moves[key] = False
 
     def generate_successor(self, player, action):
-        successor = GameState(target=self.__target,
-                              mask_locations=deepcopy(self.__mask_locations),
-                              coronas=deepcopy(self.__coronas),
-                              width=self.__width,
-                              height=self.__height,
+        successor = GameState(width=self.__width, height=self.__height,
+                              corona_1_loc=self.__corona_1_location,
+                              corona_2_loc=self.__corona_2_location,
+                              corona_3_loc=self.__corona_3_location,
                               location=self.__location,
-                              board=deepcopy(self.__board),
-                              mask=self.__mask,
+                              board=self.__board.copy(), mask=self.__mask,
+                              mask_locations=deepcopy(self.__mask_locations),
                               first_mask=self.__first_mask)
         successor.apply_action(action, player)
         return successor
@@ -227,6 +260,15 @@ class GameState(object):
     def get_location(self):
         return self.__location
 
+    def get_corona_1_location(self):
+        return self.__corona_1_location
+
+    def get_corona_2_location(self):
+        return self.__corona_2_location
+
+    def get_corona_3_location(self):
+        return self.__corona_3_location
+
     def get_mask_status(self):
         return self.__mask
 
@@ -244,15 +286,6 @@ class GameState(object):
 
     def get_first_mask(self):
         return self.__first_mask
-
-    def get_width(self):
-        return self.__width
-
-    def get_height(self):
-        return self.__height
-
-    def get_coronas(self):
-        return self.__coronas
 
     def set_first_mask(self, value):
         self.__first_mask = value
