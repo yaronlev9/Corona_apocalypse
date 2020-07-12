@@ -76,7 +76,7 @@ class ExpectimaxAgent(Agent):
         target = current_game_state.get_target()
         distance_from_target = pitagoras(target, current_game_state.get_location())
         if self.is_goal_state(current_game_state):
-            return -10000000
+            return -1000000
         distance_from_beginning = pitagoras(current_game_state.get_location(), (0, 15))
         if len(current_game_state.get_mask_locations()) >= 1:
             dist_from_mask_1 = pitagoras(current_game_state.get_mask_locations()[0],
@@ -91,8 +91,6 @@ class ExpectimaxAgent(Agent):
         corona_penalty = get_corona_penalty(current_game_state, board)
         mask_reward = get_mask_reward()
         walls_penalty = get_walls_penalty(current_game_state, board, distance_from_target)
-        if distance_from_target == 0:
-            return -1000000
         res = distance_from_target * corona_penalty * walls_penalty
         # if current_game_state.get_location() == (9, 8):
         #     print("right = ", res)
@@ -100,7 +98,8 @@ class ExpectimaxAgent(Agent):
         #     print("left = ", res)
         # elif current_game_state.get_location() == (10, 7):
         #     print("down = ", res)
-        return distance_from_target * corona_penalty * walls_penalty
+        print(distance_from_target * corona_penalty)
+        return distance_from_target * corona_penalty
         # return (dist_from_closest_mask * 11) + (distance_from_target * 5) - (distance_from_beginning * 5)
 
 
