@@ -3,6 +3,8 @@ import abc
 import random
 import game_state
 from operator import itemgetter
+import keyboard
+from time import sleep
 
 
 class Agent(object):
@@ -15,8 +17,29 @@ class Agent(object):
 
     def stop_running(self):
         pass
+
+    def is_mask_state(self, state):
+        return state.get_location() in state.get_mask_locations()
+
     def is_goal_state(self, state):
         return state.get_target() == state.get_location()
+
+
+class InteractiveAgent(Agent):
+    def __init__(self):
+        super().__init__()
+
+    def get_action(self, state):
+        sleep(0.1)
+        while True:
+            if keyboard.is_pressed('s'):
+                return game_state.Action.DOWN
+            if keyboard.is_pressed('w'):
+                return game_state.Action.UP
+            if keyboard.is_pressed('d'):
+                return game_state.Action.RIGHT
+            if keyboard.is_pressed('a'):
+                return game_state.Action.LEFT
 
 
 class ExpectimaxAgent(Agent):
@@ -49,8 +72,7 @@ class ExpectimaxAgent(Agent):
             lst = sorted(lst, key=itemgetter(0))
             return lst[0]
         else:
-            next = self.expectimax_helper((state, game_state.Action.STOP), len(state.get_coronas()), [])
-            successors += next
+            successors += self.expectimax_helper((state, game_state.Action.STOP), len(state.get_coronas()), [])
             lst = [
                 (self.expectimax(current_depth + 1, successor[0], 0)[0],
                  successor[1]) for
@@ -70,14 +92,17 @@ class ExpectimaxAgent(Agent):
         if len(state[0].get_coronas()) == coronas:
             return lst
 
-
     def evaluation_function(self, current_game_state):
         board = current_game_state.get_board()
         target = current_game_state.get_target()
         distance_from_target = pitagoras(target, current_game_state.get_location())
         if self.is_goal_state(current_game_state):
             return -1000000
+        # if self.is_mask_state(current_game_state):
+        #     return -1000000
         distance_from_beginning = pitagoras(current_game_state.get_location(), (0, 15))
+        dist_from_mask_1 = 4
+        dist_from_mask_2 = 4
         if len(current_game_state.get_mask_locations()) >= 1:
             dist_from_mask_1 = pitagoras(current_game_state.get_mask_locations()[0],
                                          current_game_state.get_location())
@@ -89,7 +114,8 @@ class ExpectimaxAgent(Agent):
         #     current_game_state.set_first_mask(False)
         #     return -1000000
         corona_penalty = get_corona_penalty(current_game_state, board)
-        mask_reward = get_mask_reward()
+        mask_reward = get_mask_reward(self.is_mask_state(current_game_state), dist_from_mask_1, dist_from_mask_2,
+                                      current_game_state)
         walls_penalty = get_walls_penalty(current_game_state, board, distance_from_target)
         res = distance_from_target * corona_penalty * walls_penalty
         # if current_game_state.get_location() == (9, 8):
@@ -98,7 +124,6 @@ class ExpectimaxAgent(Agent):
         #     print("left = ", res)
         # elif current_game_state.get_location() == (10, 7):
         #     print("down = ", res)
-        print(distance_from_target * corona_penalty)
         return distance_from_target * corona_penalty
         # return (dist_from_closest_mask * 11) + (distance_from_target * 5) - (distance_from_beginning * 5)
 
@@ -136,17 +161,16 @@ def wall_between_points(first_point, second_point, board):
     return False
 
 
-def get_mask_reward():
-    dist_from_mask_1 = 4
-    dist_from_mask_2 = 4
+def get_mask_reward(is_mask_state, dist_from_mask_1, dist_from_mask_2, state):
     mask_reward = 1
     dist_from_closest_mask = min([dist_from_mask_1, dist_from_mask_2])
-    if dist_from_closest_mask == 0:
-        mask_reward /= 3
-    elif dist_from_closest_mask <= 2:
-        mask_reward /= 2
-    elif dist_from_closest_mask == 3:
-        mask_reward /= 1.25
+    if not wall_between_points(state.get_location(), (3, 9), state.get_board()):
+        if is_mask_state:
+            mask_reward /= 3
+        elif dist_from_closest_mask <= 2:
+            mask_reward /= 2
+        elif dist_from_closest_mask == 3:
+            mask_reward /= 1.25
     return mask_reward
 
 
@@ -158,7 +182,7 @@ def get_corona_penalty(current_game_state, board):
     if not current_game_state.get_mask_status():
         for index in range(len(distance_lst)):
             if distance_lst[index] <= 3 and not wall_between_points(current_game_state.get_location(),
-                                                         current_game_state.get_coronas()[index], board):
+                                                                    current_game_state.get_coronas()[index], board):
                 if distance_lst[index] <= 2:
                     penalty += 1.5
                 elif distance_lst[index] <= 3:
@@ -258,7 +282,8 @@ class MonteCarloTreeSearchAgent(Agent):
             for i in range(50):
                 board_state = board_state.generate_successor(0, random.choice(board_state.get_legal_actions(0)))
                 for j in range(self.num_coronas):
-                    board_state = board_state.generate_successor(j + 1, random.choice(board_state.get_legal_actions(j + 1)))
+                    board_state = board_state.generate_successor(j + 1,
+                                                                 random.choice(board_state.get_legal_actions(j + 1)))
                 if board_state.get_win():
                     return 0
                 elif board_state.get_done():
@@ -267,7 +292,8 @@ class MonteCarloTreeSearchAgent(Agent):
         elif state.player == 1:
             for i in range(50):
                 for j in range(self.num_coronas):
-                    board_state = board_state.generate_successor(j + 1, random.choice(board_state.get_legal_actions(j + 1)))
+                    board_state = board_state.generate_successor(j + 1,
+                                                                 random.choice(board_state.get_legal_actions(j + 1)))
                 board_state = board_state.generate_successor(0, random.choice(board_state.get_legal_actions(0)))
                 if board_state.get_win():
                     return 0

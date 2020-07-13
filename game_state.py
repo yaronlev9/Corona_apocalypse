@@ -16,8 +16,10 @@ WALL = '*'
 EMPTY_LOCATION = '_'
 TARGET = 'W'
 
+
 class GameState(object):
-    def __init__(self, target, mask_locations, coronas, width, height, location, board=None, mask=False, first_mask=True):
+    def __init__(self, target, mask_locations, coronas, width, height, location, board=None, mask=False,
+                 first_mask=True):
         self.__width = width
         self.__height = height
         self.__score = START_SCORE
@@ -186,7 +188,7 @@ class GameState(object):
             self.__location = new_location
             if self.__board[new_location[0]][new_location[1]] == 'm' and new_location in self.__mask_locations:
                 self.__mask = True
-                self.__mask_locations.remove(new_location)
+                # self.__mask_locations.remove(new_location)
                 self.__board[new_location[0]][new_location[1]] = EMPTY_LOCATION
             self.__board[new_location[0]][new_location[1]] = '0'
             if new_location == self.__target:
