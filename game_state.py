@@ -62,7 +62,7 @@ class GameState(object):
                     self.dict_of_moves[Action.RIGHT] = True
                     return True
                 else:
-                    if self.__board[location[0]][location[1]] == '_':
+                    if self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'aaaaaaa:
                         return True
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
@@ -84,7 +84,7 @@ class GameState(object):
                     self.dict_of_moves[Action.LEFT] = True
                     return True
                 else:
-                    if self.__board[location[0]][location[1]] == '_':
+                    if self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm':
                         return True
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
@@ -106,7 +106,7 @@ class GameState(object):
                     self.dict_of_moves[Action.UP] = True
                     return True
                 else:
-                    if self.__board[location[0]][location[1]] == '_':
+                    if self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm':
                         return True
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
@@ -128,7 +128,7 @@ class GameState(object):
                     self.dict_of_moves[Action.DOWN] = True
                     return True
                 else:
-                    if self.__board[location[0]][location[1]] == '_':
+                    if self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm':
                         return True
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
