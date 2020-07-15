@@ -130,40 +130,37 @@ class ExpectimaxAgent(Agent):
         #     return -1000000
         corona_penalty = get_corona_penalty(current_game_state, board)
         mask_reward = get_mask_reward(dist_from_mask_1, dist_from_mask_2, current_game_state, closest_mask_location)
-        # walls_penalty = penalty(current_game_state.get_target(), current_game_state.get_location(), board)
+        walls_penalty = penalty(current_game_state.get_target(), current_game_state.get_location(), board,
+                                current_game_state.get_width() - 1)
         # if current_game_state.get_location() == (9, 8):
         #     print("right = ", res)
         # elif current_game_state.get_location() == (9, 6):
         #     print("left = ", res)
         # elif current_game_state.get_location() == (10, 7):
         #     print("down = ", res)
-        return distance_from_target * corona_penalty * mask_reward
+        return distance_from_target * corona_penalty * mask_reward + walls_penalty
         # return (dist_from_closest_mask * 11) + (distance_from_target * 5) - (distance_from_beginning * 5)
 
 
-def get_walls_penalty(target, location, board, addition):
+def get_walls_penalty(target, location, board, addition, size):
     penalty = 1
-    if target[0] > location[0] and board[location[0] + 1][location[1]] == '*':
+    if location[0] < size and target[0] > location[0] and board[location[0] + 1][location[1]] == '*':
         penalty += addition
-        # if distance_from_target > 10:
-        #     penalty *= 10
-    if target[1] < location[1] and board[location[0]][location[1] - 1] == '*':
+    if location[1] > 0 and target[1] < location[1] and board[location[0]][location[1] - 1] == '*':
         penalty += addition
-        # if distance_from_target > 10:
-        #     penalty *= 10
     return penalty
 
 
-def penalty(target, location, board):
-    penalty = get_walls_penalty(target, location, board, 2)
-    if board[location[0] + 1][location[1]] != '*':
-        penalty += get_walls_penalty(target, (location[0] + 1, location[1]), board, 1)
-    if board[location[0]][location[1] - 1] != '*':
-        penalty += get_walls_penalty(target, (location[0], location[1] - 1), board, 1)
-    if board[location[0] - 1][location[1]] != '*':
-        penalty += get_walls_penalty(target, (location[0] - 1, location[1]), board, 1)
-    if board[location[0]][location[1] + 1] != '*':
-        penalty += get_walls_penalty(target, (location[0], location[1] + 1), board, 1)
+def penalty(target, location, board, size):
+    penalty = get_walls_penalty(target, location, board, 2, size)
+    if location[0] < size and board[location[0] + 1][location[1]] != '*':
+        penalty += get_walls_penalty(target, (location[0] + 1, location[1]), board, 0.25, size)
+    if location[1] > 0 and board[location[0]][location[1] - 1] != '*':
+        penalty += get_walls_penalty(target, (location[0], location[1] - 1), board, 0.25, size)
+    if location[0] > 0 and board[location[0] - 1][location[1]] != '*':
+        penalty += get_walls_penalty(target, (location[0] - 1, location[1]), board, 0.25, size)
+    if location[1] < size and board[location[0]][location[1] + 1] != '*':
+        penalty += get_walls_penalty(target, (location[0], location[1] + 1), board, 0.25, size)
     return penalty
 
 
