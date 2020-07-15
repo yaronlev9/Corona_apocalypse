@@ -258,3 +258,6 @@ class GameState(object):
 
     def set_first_mask(self, value):
         self.__first_mask = value
+
+    def remove_mask_location(self, location):
+        self.__mask_locations.remove(location)

@@ -30,7 +30,7 @@ class InteractiveAgent(Agent):
         super().__init__()
 
     def get_action(self, state):
-        sleep(0.1)
+        sleep(0.2)
         while True:
             if keyboard.is_pressed('s'):
                 return game_state.Action.DOWN
@@ -55,6 +55,10 @@ class ExpectimaxAgent(Agent):
         legal moves.
         """
         """*** YOUR CODE HERE ***"""
+        if game_state.get_mask_status():
+            if game_state.get_location() in game_state.get_mask_locations():
+                game_state.remove_mask_location(game_state.get_location())
+                game_state.set_first_mask(False)
         return self.expectimax(0, game_state, 0)[1]
 
     def expectimax(self, current_depth, state, player):
@@ -70,7 +74,13 @@ class ExpectimaxAgent(Agent):
                     successor[1]) for
                    successor in successors]
             lst = sorted(lst, key=itemgetter(0))
-            return lst[0]
+            highest_evaluation_list = []
+            for pair in lst:
+                if pair[0] == lst[0][0]:
+                    highest_evaluation_list += [pair]
+                else:
+                    break
+            return random.choice(highest_evaluation_list)
         else:
             successors += self.expectimax_helper((state, game_state.Action.STOP), len(state.get_coronas()), [])
             lst = [
@@ -103,45 +113,57 @@ class ExpectimaxAgent(Agent):
         distance_from_beginning = pitagoras(current_game_state.get_location(), (0, 15))
         dist_from_mask_1 = 4
         dist_from_mask_2 = 4
+        closest_mask_location = None
         if len(current_game_state.get_mask_locations()) >= 1:
-            dist_from_mask_1 = pitagoras(current_game_state.get_mask_locations()[0],
-                                         current_game_state.get_location())
+            dist_from_mask_1 = manhattan_distance(current_game_state.get_mask_locations()[0],
+                                                  current_game_state.get_location())
+            closest_mask_location = current_game_state.get_mask_locations()[0]
         if len(current_game_state.get_mask_locations()) >= 2:
-            dist_from_mask_2 = pitagoras(current_game_state.get_mask_locations()[1],
-                                         current_game_state.get_location())
+            dist_from_mask_2 = manhattan_distance(current_game_state.get_mask_locations()[1],
+                                                  current_game_state.get_location())
+            if dist_from_mask_1 > dist_from_mask_2:
+                closest_mask_location = current_game_state.get_mask_locations()[1]
+
         # if current_game_state.get_mask_status():
         # if current_game_state.get_mask_status() and current_game_state.get_first_mask():
         #     current_game_state.set_first_mask(False)
         #     return -1000000
         corona_penalty = get_corona_penalty(current_game_state, board)
-        mask_reward = get_mask_reward(self.is_mask_state(current_game_state), dist_from_mask_1, dist_from_mask_2,
-                                      current_game_state)
-        walls_penalty = get_walls_penalty(current_game_state, board, distance_from_target)
-        res = distance_from_target * corona_penalty * walls_penalty
+        mask_reward = get_mask_reward(dist_from_mask_1, dist_from_mask_2, current_game_state, closest_mask_location)
+        # walls_penalty = penalty(current_game_state.get_target(), current_game_state.get_location(), board)
         # if current_game_state.get_location() == (9, 8):
         #     print("right = ", res)
         # elif current_game_state.get_location() == (9, 6):
         #     print("left = ", res)
         # elif current_game_state.get_location() == (10, 7):
         #     print("down = ", res)
-        return distance_from_target * corona_penalty
+        return distance_from_target * corona_penalty * mask_reward
         # return (dist_from_closest_mask * 11) + (distance_from_target * 5) - (distance_from_beginning * 5)
 
 
-def get_walls_penalty(state, board, distance_from_target):
+def get_walls_penalty(target, location, board, addition):
     penalty = 1
-    target = state.get_target()
-    location = state.get_location()
     if target[0] > location[0] and board[location[0] + 1][location[1]] == '*':
-        if distance_from_target <= 10:
-            penalty *= 5
+        penalty += addition
         # if distance_from_target > 10:
         #     penalty *= 10
     if target[1] < location[1] and board[location[0]][location[1] - 1] == '*':
-        if distance_from_target <= 10:
-            penalty *= 5
+        penalty += addition
         # if distance_from_target > 10:
         #     penalty *= 10
+    return penalty
+
+
+def penalty(target, location, board):
+    penalty = get_walls_penalty(target, location, board, 2)
+    if board[location[0] + 1][location[1]] != '*':
+        penalty += get_walls_penalty(target, (location[0] + 1, location[1]), board, 1)
+    if board[location[0]][location[1] - 1] != '*':
+        penalty += get_walls_penalty(target, (location[0], location[1] - 1), board, 1)
+    if board[location[0] - 1][location[1]] != '*':
+        penalty += get_walls_penalty(target, (location[0] - 1, location[1]), board, 1)
+    if board[location[0]][location[1] + 1] != '*':
+        penalty += get_walls_penalty(target, (location[0], location[1] + 1), board, 1)
     return penalty
 
 
@@ -161,11 +183,12 @@ def wall_between_points(first_point, second_point, board):
     return False
 
 
-def get_mask_reward(is_mask_state, dist_from_mask_1, dist_from_mask_2, state):
+def get_mask_reward(dist_from_mask_1, dist_from_mask_2, state, closest_mask_location):
     mask_reward = 1
     dist_from_closest_mask = min([dist_from_mask_1, dist_from_mask_2])
-    if not wall_between_points(state.get_location(), (3, 9), state.get_board()):
-        if is_mask_state:
+    if closest_mask_location is not None and not wall_between_points(state.get_location(), closest_mask_location,
+                                                                     state.get_board()) and state.get_first_mask():
+        if dist_from_closest_mask < 2:
             mask_reward /= 3
         elif dist_from_closest_mask <= 2:
             mask_reward /= 2
