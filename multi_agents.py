@@ -106,11 +106,8 @@ class ExpectimaxAgent(Agent):
         board = current_game_state.get_board()
         target = current_game_state.get_target()
         distance_from_target = pitagoras(target, current_game_state.get_location())
-        if self.is_goal_state(current_game_state):
-            return -1000000
-        # if self.is_mask_state(current_game_state):
+        # if self.is_goal_state(current_game_state):
         #     return -1000000
-        distance_from_beginning = pitagoras(current_game_state.get_location(), (0, 15))
         dist_from_mask_1 = 4
         dist_from_mask_2 = 4
         closest_mask_location = None
@@ -123,23 +120,12 @@ class ExpectimaxAgent(Agent):
                                                   current_game_state.get_location())
             if dist_from_mask_1 > dist_from_mask_2:
                 closest_mask_location = current_game_state.get_mask_locations()[1]
-
-        # if current_game_state.get_mask_status():
-        # if current_game_state.get_mask_status() and current_game_state.get_first_mask():
-        #     current_game_state.set_first_mask(False)
-        #     return -1000000
         corona_penalty = get_corona_penalty(current_game_state, board)
         mask_reward = get_mask_reward(dist_from_mask_1, dist_from_mask_2, current_game_state, closest_mask_location)
+        penalize_mask = random.choice([0, 1, 2])
         walls_penalty = penalty(current_game_state.get_target(), current_game_state.get_location(), board,
-                                current_game_state.get_width() - 1)
-        # if current_game_state.get_location() == (9, 8):
-        #     print("right = ", res)
-        # elif current_game_state.get_location() == (9, 6):
-        #     print("left = ", res)
-        # elif current_game_state.get_location() == (10, 7):
-        #     print("down = ", res)
+                                current_game_state.get_width() - 1) if penalize_mask else 1
         return distance_from_target * corona_penalty * mask_reward + walls_penalty
-        # return (dist_from_closest_mask * 11) + (distance_from_target * 5) - (distance_from_beginning * 5)
 
 
 def get_walls_penalty(target, location, board, addition, size):
