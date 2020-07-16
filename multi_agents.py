@@ -186,11 +186,11 @@ def get_mask_reward(dist_from_mask_1, dist_from_mask_2, state, closest_mask_loca
     if closest_mask_location is not None and not wall_between_points(state.get_location(), closest_mask_location,
                                                                      state.get_board()) and state.get_first_mask():
         if dist_from_closest_mask < 2:
-            mask_reward /= 3
+            mask_reward /= 1.5
         elif dist_from_closest_mask <= 2:
-            mask_reward /= 2
+            mask_reward /= 1.3
         elif dist_from_closest_mask == 3:
-            mask_reward /= 1.25
+            mask_reward /= 1.1
     return mask_reward
 
 
