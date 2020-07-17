@@ -244,12 +244,12 @@ class MonteCarloTreeSearchAgent(Agent):
         self.root = Node(game_state, 0, None)
         self.closest_target = closest_target(find_masks(game_state.get_board(), game_state.get_mask_locations()) +
                                              [game_state.get_target()], game_state.get_location(), game_state.get_board())[0]
-        print(self.closest_target)
+        #print(self.closest_target)
         self.monte_carlo_tree_search(self.root)
-        for child in self.children:
-            print(child[0].wins, child[0].simulations_counter)
+        #for child in self.children:
+        #    print(child[0].wins, child[0].simulations_counter)
         best = self.best_child()
-        print(best[0].wins, best[1])
+        #print(best[0].wins, best[1])
         return best[1]
 
     def monte_carlo_tree_search(self, state):
@@ -285,24 +285,6 @@ class MonteCarloTreeSearchAgent(Agent):
                     self.num_simulations += 1
                     child.set_simulations(self.num_simulations)
                     num_moves = int(manhattan_distance(child.state.get_location(), self.closest_target) * 1.5)
-                    # result = 0
-                    # syringes_count = 0
-                    # masks_count = 0
-                    # for i in range(5):
-                    #     res, cause = self.run_simulation(child, num_moves)
-                    #     result += res
-                    #     if cause == "syringe":
-                    #         syringes_count += 1
-                    #     if cause == "masks":
-                    #         masks_count += 1
-                    # result = round(result / 5)
-                    # if result == 0:
-                    #     if syringes_count > masks_count:
-                    #         self.back_propagate(child, result, "syringe")
-                    #     else:
-                    #         self.back_propagate(child, result, "masks")
-                    # else:
-                    #     self.back_propagate(child, result)
                     res, cause = self.run_simulation(child, num_moves)
                     self.back_propagate(child, res, cause)
                     heappush(leafs, child)
@@ -452,7 +434,7 @@ def find_empty_cells(board, location):
     lst2 = []
     for row in range(len(board)):
         for col in range(len(board[0])):
-            if board[row][col] == "_" and 2 <= manhattan_distance(location, (row, col)) <= 5:
+            if board[row][col] == "_" and 1 <= manhattan_distance(location, (row, col)) <= 5:
                 lst1.append((row, col))
             if board[row][col] == "_" and 1 <= pitagoras(location, (row, col)) <= 2:
                 lst2.append((row, col))
