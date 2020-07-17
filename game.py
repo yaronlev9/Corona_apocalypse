@@ -154,7 +154,7 @@ if __name__ == '__main__':
     if argv[3] == 'Expectimax':
         agent = multi_agents.ExpectimaxAgent(2)
     elif argv[3] == 'MonteCarlo':
-        agent = multi_agents.MonteCarloTreeSearchAgent(150)
+        agent = multi_agents.MonteCarloTreeSearchAgent(100)
     elif argv[3] == 'Interactive':
         agent = multi_agents.InteractiveAgent()
     else:
