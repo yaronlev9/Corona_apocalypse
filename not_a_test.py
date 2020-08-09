@@ -16,6 +16,7 @@ def test_board(all_result, states, max_time):
         result_monte_carlo = []
         i = 0
         while i < 50:
+            print(i)
             start = time.time()
             ga = game_state.GameState(state[0], copy.deepcopy(state[1]), copy.deepcopy(state[2]), state[3], state[4],
                                       state[5], copy.deepcopy(state[6]))
@@ -28,6 +29,7 @@ def test_board(all_result, states, max_time):
         result.append(result_expectimax)
         i = 0
         while i < 50:
+            print(i)
             start = time.time()
             ga = game_state.GameState(state[0], copy.deepcopy(state[1]), copy.deepcopy(state[2]), state[3], state[4],
                                       state[5], copy.deepcopy(state[6]))
