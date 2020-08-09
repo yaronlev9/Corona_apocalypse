@@ -79,3 +79,6 @@ class Display:
             name = "corona" + str(counter)
             self.change_pos(name, corona)
             counter += 1
+
+    def destroy(self):
+        self.root.destroy()

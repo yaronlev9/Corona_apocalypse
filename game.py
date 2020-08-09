@@ -76,7 +76,7 @@ class Game(object):
         self._state = None
         self._should_quit = False
 
-    def run(self, initial_state, max_time):
+    def run(self, initial_state, max_time=None):
         if self.display:
             self.display.root.update()
         self._should_quit = False
@@ -100,12 +100,18 @@ class Game(object):
                 self.display.draw_state(self._state)
                 self.display.root.update()
             if max_time and time.time() - start > max_time * 60:
-                return -1
+                if self.display:
+                    self.display.destroy()
+                return (-1, self._state.get_score)
         if self._state.get_win():
-            #print("you won!!!")
+            print("you won!!!")
+            if self.display:
+                self.display.destroy()
             return (1, self._state.get_score())
         else:
-            #print("you lose :(")
+            print("you lose :(")
+            if self.display:
+                self.display.destroy()
             return (0, self._state.get_score())
 
 
@@ -170,35 +176,3 @@ if __name__ == '__main__':
         exit()
     t = Game(agent, GUI.Display(ga))
     t.run(ga)
-
-# import game
-# import game_state
-# import time
-# import pytest
-# import random
-# import multi_agents
-#
-#
-# def test_board_4(result):
-#     result_expectimax = []
-#     result_monte_carlo = []
-#     board = game.BOARD_4
-#     state_1 = [(3, 0), [(1, 0), (3, 3)], [(0, 0), (1, 2)], 4, 4, (0, 3), board]
-#     state_2 = [(3, 0), [(1, 0), (3, 3)], [(0, 0), (1, 2)], 4, 4, (0, 3), board]
-#     ga = game_state.GameState(state_1[0], state_1[1], state_1, state_1[3], state_1[4], state_1[5], state_1[6])
-#     agent = multi_agents.ExpectimaxAgent(2)
-#     t = game.Game(agent)
-#     i = 0
-#     while i < 50:
-#         start = time.time()
-#         res = t.run(ga)
-#         end = time.time()
-#         i += 1
-#         result_expectimax.append([res[0], end-start, res[1]])
-#     result.append(result_expectimax)
-#
-#
-# if __name__ == '__main__':
-#     result = []
-#     test_board_4(result)
-#     print(result)
