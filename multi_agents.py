@@ -541,8 +541,6 @@ class Node():
         self.total_simulations = num
 
 
-START_NUM_MOVES = 30
-
 
 class MonteCarloTreeSearchAgent(Agent):
 
@@ -557,17 +555,16 @@ class MonteCarloTreeSearchAgent(Agent):
         self.children = []
         self.children_to_explore = []
         self.num_simulations = 0
-        self.num_moves = START_NUM_MOVES
         self.num_coronas = len(game_state.get_coronas())
         self.root = Node(game_state, 0, None)
-        self.closest_target = closest_target(find_masks(game_state.get_board(), game_state.get_mask_locations()) +
-                                             [game_state.get_target()], game_state.get_location(), game_state.get_board())[0]
-        #print(self.closest_target)
+        if not game_state.get_mask_status():
+            self.closest_target = closest_target(find_masks(game_state.get_board(), game_state.get_mask_locations()) +
+                                     [game_state.get_target()], game_state.get_location(), game_state.get_board())[0]
+        else:
+            self.closest_target = closest_target([game_state.get_target()], game_state.get_location(),
+                                                 game_state.get_board())[0]
         self.monte_carlo_tree_search(self.root)
-        #for child in self.children:
-        #    print(child[0].wins, child[0].simulations_counter)
         best = self.best_child()
-        #print(best[0].wins, best[1])
         return best[1]
 
     def monte_carlo_tree_search(self, state):
@@ -629,7 +626,7 @@ class MonteCarloTreeSearchAgent(Agent):
     def back_propagate(self, node, result, cause=None):
         while node != None:
             if result == 1 and node.player == 0:
-                node.wins += 10
+                node.wins += 50
             elif result == 0 and node.player == 1:
                 if cause == "mask" or cause is None:
                     node.wins += 10
