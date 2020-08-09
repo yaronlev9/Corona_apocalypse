@@ -104,12 +104,12 @@ class Game(object):
                     self.display.destroy()
                 return (-1, self._state.get_score)
         if self._state.get_win():
-            print("you won!!!")
+            #print("you won!!!")
             if self.display:
                 self.display.destroy()
             return (1, self._state.get_score())
         else:
-            print("you lose :(")
+            #print("you lose :(")
             if self.display:
                 self.display.destroy()
             return (0, self._state.get_score())
