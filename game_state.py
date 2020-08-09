@@ -54,7 +54,7 @@ class GameState(object):
             if self.__mask:
                 flag = False
                 for corona in self.__coronas:
-                    if self.__board[location[0]][location[1]] == corona:
+                    if location == corona:
                         flag = True
                 if flag:
                     if location[1] + 1 >= self.__width or self.__board[location[0]][location[1] + 1] != '_':
@@ -62,7 +62,7 @@ class GameState(object):
                     self.dict_of_moves[Action.RIGHT] = True
                     return True
                 else:
-                    if self.__board[location[0]][location[1]] == '_':
+                    if self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm':
                         return True
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
@@ -76,7 +76,7 @@ class GameState(object):
             if self.__mask:
                 flag = False
                 for corona in self.__coronas:
-                    if self.__board[location[0]][location[1]] == corona:
+                    if location == corona:
                         flag = True
                 if flag:
                     if location[1] - 1 < 0 or self.__board[location[0]][location[1] - 1] != '_':
@@ -84,7 +84,7 @@ class GameState(object):
                     self.dict_of_moves[Action.LEFT] = True
                     return True
                 else:
-                    if self.__board[location[0]][location[1]] == '_':
+                    if self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm':
                         return True
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
@@ -98,7 +98,7 @@ class GameState(object):
             if self.__mask:
                 flag = False
                 for corona in self.__coronas:
-                    if self.__board[location[0]][location[1]] == corona:
+                    if location == corona:
                         flag = True
                 if flag:
                     if location[0] - 1 < 0 or self.__board[location[0] - 1][location[1]] != '_':
@@ -106,7 +106,7 @@ class GameState(object):
                     self.dict_of_moves[Action.UP] = True
                     return True
                 else:
-                    if self.__board[location[0]][location[1]] == '_':
+                    if self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm':
                         return True
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
@@ -120,7 +120,7 @@ class GameState(object):
             if self.__mask:
                 flag = False
                 for corona in self.__coronas:
-                    if self.__board[location[0]][location[1]] == corona:
+                    if location == corona:
                         flag = True
                 if flag:
                     if location[0] + 1 >= self.__height or self.__board[location[0] + 1][location[1]] != '_':
@@ -128,7 +128,7 @@ class GameState(object):
                     self.dict_of_moves[Action.DOWN] = True
                     return True
                 else:
-                    if self.__board[location[0]][location[1]] == '_':
+                    if self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm':
                         return True
                     return False
             return self.__board[location[0]][location[1]] == '_' or self.__board[location[0]][location[1]] == 'm'
@@ -258,3 +258,6 @@ class GameState(object):
 
     def set_first_mask(self, value):
         self.__first_mask = value
+
+    def remove_mask_location(self, location):
+        self.__mask_locations.remove(location)
