@@ -26,16 +26,16 @@ BOARD_16 = [
 BOARD_12 = [
     ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_'],
     ['*', '_', '_', '_', '*', '*', '*', '*', '_', '_', '_', '_'],
-    ['*', '*', '_', '_', '_', '_', '*', '*', '_', '*', '*', '_'],
-    ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '*', '_'],
-    ['_', '_', '_', '_', '_', '_', '_', '_', '_', '*', '*', '_'],
+    ['*', '*', '*', '_', '_', '_', '*', '*', '_', '*', '*', '_'],
+    ['_', '*', '_', '_', '_', '_', '_', '_', '_', '_', '*', '_'],
+    ['_', '_', '_', '*', '*', '_', '_', '_', '_', '*', '*', '_'],
     ['_', '_', '_', '*', '*', '_', '*', '*', '_', '_', '_', '_'],
-    ['*', '_', '*', '*', '_', '_', '_', '_', '_', '_', '_', '_'],
-    ['*', '_', '*', '_', '_', '_', '_', '_', '_', '_', '_', '_'],
-    ['*', '_', '_', '_', '_', '_', '_', '_', '*', '*', '_', '_'],
-    ['_', '_', '_', '_', '_', '*', '_', '*', '*', '_', '_', '*'],
+    ['*', '_', '*', '*', '_', '_', '_', '*', '_', '_', '*', '_'],
+    ['*', '_', '*', '_', '_', '_', '*', '*', '_', '_', '*', '_'],
+    ['*', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_'],
+    ['_', '_', '*', '_', '_', '*', '_', '*', '*', '_', '_', '*'],
     ['_', '*', '*', '_', '_', '*', '_', '*', '*', '_', '_', '*'],
-    ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '*']]
+    ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '*', '*']]
 
 BOARD_8 = [
     ['_', '_', '_', '*', '*', '_', '_', '_'],
@@ -62,21 +62,22 @@ BOARD_4 = [
 # TARGET
 # BOARD
 
-CORONA_4 = [(3, 0), [(1, 0), (3, 3)], [(0, 0), (1, 2)], 4, 4, (0, 3), BOARD_4]
+CORONA_4 = [(3, 0), [], [(0, 0), (1, 2)], 4, 4, (0, 3), BOARD_4]
 CORONA_8 = [(7, 0), [(5, 4), (3, 7)], [(0, 0), (7, 3)], 8, 8, (0, 7), BOARD_8]
 CORONA_12 = [(11, 0), [(5, 4), (3, 9)], [(0, 0), (8, 2), (5, 10)], 12, 12, (0, 11), BOARD_12]
 CORONA_16 = [(15, 0), [(7, 15), (3, 9)], [(0, 0), (8, 2), (7, 6)], 16, 16, (0, 15), BOARD_16]
 
 
 class Game(object):
-    def __init__(self, agent, display):
+    def __init__(self, agent, display=None):
         self.agent = agent
         self.display = display
         self._state = None
         self._should_quit = False
 
     def run(self, initial_state):
-        self.display.root.update()
+        if self.display:
+            self.display.root.update()
         self._should_quit = False
         self._state = initial_state
         return self._game_loop(initial_state)
@@ -93,12 +94,15 @@ class Game(object):
             for corona in range(len(initial_state.get_coronas())):
                 opponent_action = random.choice(self._state.get_legal_actions(corona + 1))
                 self._state.apply_action(opponent_action, corona + 1)
-            self.display.draw_state(self._state)
-            self.display.root.update()
+            if self.display:
+                self.display.draw_state(self._state)
+                self.display.root.update()
         if self._state.get_win():
-            print("you won!!!")
+            #print("you won!!!")
+            return (1, self._state.get_score())
         else:
-            print("you lose :(")
+            #print("you lose :(")
+            return (0, self._state.get_score())
 
 
 if __name__ == '__main__':
@@ -162,3 +166,35 @@ if __name__ == '__main__':
         exit()
     t = Game(agent, GUI.Display(ga))
     t.run(ga)
+
+# import game
+# import game_state
+# import time
+# import pytest
+# import random
+# import multi_agents
+#
+#
+# def test_board_4(result):
+#     result_expectimax = []
+#     result_monte_carlo = []
+#     board = game.BOARD_4
+#     state_1 = [(3, 0), [(1, 0), (3, 3)], [(0, 0), (1, 2)], 4, 4, (0, 3), board]
+#     state_2 = [(3, 0), [(1, 0), (3, 3)], [(0, 0), (1, 2)], 4, 4, (0, 3), board]
+#     ga = game_state.GameState(state_1[0], state_1[1], state_1, state_1[3], state_1[4], state_1[5], state_1[6])
+#     agent = multi_agents.ExpectimaxAgent(2)
+#     t = game.Game(agent)
+#     i = 0
+#     while i < 50:
+#         start = time.time()
+#         res = t.run(ga)
+#         end = time.time()
+#         i += 1
+#         result_expectimax.append([res[0], end-start, res[1]])
+#     result.append(result_expectimax)
+#
+#
+# if __name__ == '__main__':
+#     result = []
+#     test_board_4(result)
+#     print(result)
