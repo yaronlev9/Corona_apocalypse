@@ -4,6 +4,7 @@ import random
 import GUI
 from sys import argv
 import sys
+import time
 
 BOARD_16 = [
     ['_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_', '_'],
@@ -75,17 +76,18 @@ class Game(object):
         self._state = None
         self._should_quit = False
 
-    def run(self, initial_state):
+    def run(self, initial_state, max_time):
         if self.display:
             self.display.root.update()
         self._should_quit = False
         self._state = initial_state
-        return self._game_loop(initial_state)
+        return self._game_loop(initial_state, max_time)
 
     def quit(self):
         self._should_quit = True
 
-    def _game_loop(self, initial_state):
+    def _game_loop(self, initial_state, max_time):
+        start = time.time()
         while not self._state.get_done() and not self._should_quit:
             action = self.agent.get_action(self._state)
             self._state.apply_action(action, 0)
@@ -97,6 +99,8 @@ class Game(object):
             if self.display:
                 self.display.draw_state(self._state)
                 self.display.root.update()
+            if max_time and time.time() - start > max_time * 60:
+                return -1
         if self._state.get_win():
             #print("you won!!!")
             return (1, self._state.get_score())
