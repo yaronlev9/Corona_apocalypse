@@ -239,7 +239,12 @@ class MonteCarloTreeSearchAgent(Agent):
         self.num_simulations = 0
         self.num_coronas = len(game_state.get_coronas())
         self.root = Node(game_state, 0, None)
-        self.closest_target = closest_target([game_state.get_target()], game_state.get_location(), game_state.get_board())[0]
+        if not game_state.get_mask_status():
+            self.closest_target = closest_target(find_masks(game_state.get_board(), game_state.get_mask_locations()) +
+                                     [game_state.get_target()], game_state.get_location(), game_state.get_board())[0]
+        else:
+            self.closest_target = closest_target([game_state.get_target()], game_state.get_location(),
+                                                 game_state.get_board())[0]
         self.monte_carlo_tree_search(self.root)
         best = self.best_child()
         return best[1]
@@ -359,9 +364,13 @@ class MonteCarloTreeSearchAgent(Agent):
         return best_state
 
 def closest_target(targets, location, board):
-
-    closest_target = targets[0]
-    min = manhattan_distance(location, targets[0])
+    min = None
+    closest_target = None
+    for target in targets:
+        distance = manhattan_distance(location, target)
+        if min is None or distance < min:
+            min = distance
+            closest_target = target
     if min > 5:
         lst, closer_cells = find_empty_cells(board, location)
         random.shuffle(lst)
