@@ -77,11 +77,10 @@ def run_all_test():
     # corona_16_3 = [(15, 0), [(13, 11), (6, 4)], [(11, 10), (10, 2), (7, 7)], 16, 16, (0, 15), game.BOARD_16]
     # corona_16_4 = [(12, 0), [(7, 15), (14, 7)], [(0, 8), (5, 10), (12, 7)], 16, 16, (0, 15), game.BOARD_16]
     # corona_16_5 = [(15, 0), [(7, 9), (6, 0)], [(11, 2), (4, 3), (7, 7)], 16, 16, (0, 15), game.BOARD_16]
-    # corona_16_6 = [(15, 0), [(9, 10), (0, 0)], [(3, 7), (9, 8), (13, 2)], 16, 16, (0, 15), game.BOARD_16]
     # states_16 = [corona_16_1, corona_16_2, corona_16_3, corona_16_4, corona_16_5, corona_16_6]
     # print("run test board 16")
     # test_board(result_board_16, states_16, 3)
-    # write_to_file(result_board_16, "board_16_result.txt", 6)
+    # write_to_file(result_board_16, "board_16_result.txt", 5)
 
 def write_to_file(lst, file, num_states):
     f = open(file,"w+")
