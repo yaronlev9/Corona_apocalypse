@@ -63,10 +63,10 @@ BOARD_4 = [
 # TARGET
 # BOARD
 
-CORONA_4 = [(3, 0), [], [(0, 0), (1, 2)], 4, 4, (0, 3), BOARD_4]
-CORONA_8 = [(7, 0), [(5, 4), (3, 7)], [(0, 0), (7, 3)], 8, 8, (0, 7), BOARD_8]
-CORONA_12 = [(11, 0), [(5, 4), (3, 9)], [(0, 0), (8, 2), (5, 10)], 12, 12, (0, 11), BOARD_12]
-CORONA_16 = [(15, 0), [(7, 15), (3, 9)], [(0, 0), (8, 2), (7, 6)], 16, 16, (0, 15), BOARD_16]
+CORONA_4 = [(3, 0), [], [(1, 2)], 4, 4, (0, 3), BOARD_4]
+CORONA_8 = [(7, 0), [(7, 5)], [(1, 1), (7, 3)], 8, 8, (0, 7), BOARD_8]
+CORONA_12 = [(11, 0), [(5, 0), (11, 8)], [(3, 3), (8, 2), (2, 11)], 12, 12, (0, 11), BOARD_12]
+CORONA_16 = [(12, 0), [(7, 15), (14, 7)], [(0, 8), (5, 10), (12, 7)], 16, 16, (0, 15), BOARD_16]
 
 
 class Game(object):
@@ -79,6 +79,8 @@ class Game(object):
     def run(self, initial_state, max_time=None):
         if self.display:
             self.display.root.update()
+        else:
+            print(initial_state)
         self._should_quit = False
         self._state = initial_state
         return self._game_loop(initial_state, max_time)
@@ -99,24 +101,26 @@ class Game(object):
             if self.display:
                 self.display.draw_state(self._state)
                 self.display.root.update()
+            else:
+                print(self._state)
             if max_time and time.time() - start > max_time * 60:
                 if self.display:
                     self.display.destroy()
-                return (-1, self._state.get_score)
+                return -1, self._state.get_score
         if self._state.get_win():
-            #print("you won!!!")
+            print("you won!!!")
             if self.display:
                 self.display.destroy()
-            return (1, self._state.get_score())
+            return 1, self._state.get_score()
         else:
-            #print("you lose :(")
+            print("you lose :(")
             if self.display:
                 self.display.destroy()
-            return (0, self._state.get_score())
+            return 0, self._state.get_score()
 
 
 if __name__ == '__main__':
-    # argv[1] = board size, argv[2] = number of coronas, argv[3] = agent
+    # argv[1] = board size, argv[2] = number of coronas, argv[3] = agent, argv[4] = simpleDisplay (potential)
     corona_list = []
     if argv[1] == '4':
         if argv[2] == '1':
@@ -174,5 +178,8 @@ if __name__ == '__main__':
     else:
         print("Error: agents can only be one of the following: Expectimax, MonteCarlo, Interactive", file=sys.stderr)
         exit()
-    t = Game(agent, GUI.Display(ga))
+    if len(argv) >= 4 and argv[4] == "simpleDisplay":
+        t = Game(agent, None)
+    else:
+        t = Game(agent, GUI.Display(ga))
     t.run(ga)

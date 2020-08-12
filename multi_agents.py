@@ -107,8 +107,6 @@ class ExpectimaxAgent(Agent):
         board = current_game_state.get_board()
         target = current_game_state.get_target()
         distance_from_target = pitagoras(target, current_game_state.get_location())
-        # if self.is_goal_state(current_game_state):
-        #     return -1000000
         dist_from_mask_1 = 4
         dist_from_mask_2 = 4
         closest_mask_location = None
@@ -223,7 +221,6 @@ class Node():
         self.total_simulations = num
 
 
-
 class MonteCarloTreeSearchAgent(Agent):
 
     def __init__(self, max_simulations):
@@ -241,7 +238,8 @@ class MonteCarloTreeSearchAgent(Agent):
         self.root = Node(game_state, 0, None)
         if not game_state.get_mask_status():
             self.closest_target = closest_target(find_masks(game_state.get_board(), game_state.get_mask_locations()) +
-                                     [game_state.get_target()], game_state.get_location(), game_state.get_board())[0]
+                                                 [game_state.get_target()], game_state.get_location(),
+                                                 game_state.get_board())[0]
         else:
             self.closest_target = closest_target([game_state.get_target()], game_state.get_location(),
                                                  game_state.get_board())[0]
@@ -292,7 +290,6 @@ class MonteCarloTreeSearchAgent(Agent):
             else:
                 cur_state = self.children_to_explore.pop()
             board_state = cur_state.state
-
 
     def monte_carlo_helper(self, state, coronas, lst, parent):
         if coronas == 0:
@@ -366,6 +363,7 @@ class MonteCarloTreeSearchAgent(Agent):
                 best_state = state
         return best_state
 
+
 def closest_target(targets, location, board):
     min = None
     closest_target = None
@@ -419,8 +417,9 @@ def calculate_score(state):
     if state.simulations_counter == 0:
         return math.inf
     score = -(state.wins / state.simulations_counter) + \
-            math.sqrt(2)*(math.log(state.total_simulations) / state.simulations_counter)
+            math.sqrt(2) * (math.log(state.total_simulations) / state.simulations_counter)
     return score
+
 
 def find_masks(board, masks):
     lst = []
@@ -428,6 +427,7 @@ def find_masks(board, masks):
         if board[mask[0]][mask[1]] == 'm':
             lst.append(mask)
     return lst
+
 
 def find_empty_cells(board, location):
     lst1 = []
