@@ -349,6 +349,8 @@ class MonteCarloTreeSearchAgent(Agent):
     def best_child(self):
         flag = True
         for child in range(len(self.children) - 1):
+            self.children[child][0].set_simulations(self.max_simulations)
+            self.children[child + 1][0].set_simulations(self.max_simulations)
             if calculate_score(self.children[child][0]) != calculate_score(self.children[child + 1][0]):
                 flag = False
                 break
@@ -357,6 +359,7 @@ class MonteCarloTreeSearchAgent(Agent):
         min = math.inf
         best_state = None
         for state in self.children:
+            state[0].set_simulations(self.max_simulations)
             score = calculate_score(state[0])
             if score < min or best_state is None:
                 min = score
