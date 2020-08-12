@@ -178,7 +178,7 @@ if __name__ == '__main__':
     else:
         print("Error: agents can only be one of the following: Expectimax, MonteCarlo, Interactive", file=sys.stderr)
         exit()
-    if len(argv) >= 4 and argv[4] == "simpleDisplay":
+    if len(argv) >= 5 and argv[4] == "simpleDisplay":
         t = Game(agent, None)
     else:
         t = Game(agent, GUI.Display(ga))
