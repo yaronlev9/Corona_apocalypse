@@ -9,28 +9,43 @@ from time import sleep
 
 
 class Agent(object):
+    """
+    an abstract agent class.
+    """
     def __init__(self):
         super(Agent, self).__init__()
 
     @abc.abstractmethod
     def get_action(self, game_state):
+        """
+        gets an action for a game state.
+        """
         return
 
-    def stop_running(self):
-        pass
-
     def is_mask_state(self, state, masks_locations):
+        """
+        returns true iff the given state is a state where the player stands on a mask location.
+        """
         return state.get_location() in masks_locations
 
     def is_goal_state(self, state):
+        """
+        returns true iff the state is a state where the player got to the target.
+        """
         return state.get_target() == state.get_location()
 
 
 class InteractiveAgent(Agent):
+    """
+    an agent for the game, that lets a player use the keyboard to play the game.
+    """
     def __init__(self):
         super().__init__()
 
     def get_action(self, state):
+        """
+        gets a possible action for a given game state.
+        """
         sleep(0.2)
         while True:
             if keyboard.is_pressed('s'):
@@ -44,6 +59,9 @@ class InteractiveAgent(Agent):
 
 
 class ExpectimaxAgent(Agent):
+    """
+    an agent that implements the Expectimax algorithm in order to solve the board.
+    """
     def __init__(self, depth):
         super().__init__()
         self.depth = depth
@@ -55,7 +73,6 @@ class ExpectimaxAgent(Agent):
         The opponent should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        """*** YOUR CODE HERE ***"""
         if game_state.get_mask_status():
             if game_state.get_location() in game_state.get_mask_locations():
                 game_state.remove_mask_location(game_state.get_location())
@@ -63,6 +80,9 @@ class ExpectimaxAgent(Agent):
         return self.expectimax(0, game_state, 0)[1]
 
     def expectimax(self, current_depth, state, player):
+        """
+        the expectimax algorithm implementation.
+        """
         successors = []
         if current_depth == self.depth or state.get_done():
             return self.evaluation_function(state), game_state.Action.STOP
@@ -93,6 +113,9 @@ class ExpectimaxAgent(Agent):
             return avg, game_state.Action.STOP
 
     def expectimax_helper(self, state, coronas, lst):
+        """
+        a helper for expectimax, that implements a recursive part of the algorithm.
+        """
         if coronas == 0:
             return
         for action in state[0].get_legal_actions(coronas):
@@ -104,6 +127,9 @@ class ExpectimaxAgent(Agent):
             return lst
 
     def evaluation_function(self, current_game_state):
+        """"
+        evaluates the credibility of a given state for expectimax algorithm.
+        """
         board = current_game_state.get_board()
         target = current_game_state.get_target()
         distance_from_target = pitagoras(target, current_game_state.get_location())
@@ -128,6 +154,10 @@ class ExpectimaxAgent(Agent):
 
 
 def get_walls_penalty(target, location, board, addition, size):
+    """
+    a heuristic function used by the evaluation function, that penalizes a state credibility if there is
+    a wall between the player and the target.
+    """
     penalty = 1
     if location[0] < size and target[0] > location[0] and board[location[0] + 1][location[1]] == '*':
         penalty += addition
@@ -137,6 +167,10 @@ def get_walls_penalty(target, location, board, addition, size):
 
 
 def penalty(target, location, board, size):
+    """
+     a heuristic function used by the evaluation function, that penalizes a state credibility if there is
+    a wall between the player and the target.
+    """
     penalty = get_walls_penalty(target, location, board, 2, size)
     if location[0] < size and board[location[0] + 1][location[1]] != '*':
         penalty += get_walls_penalty(target, (location[0] + 1, location[1]), board, 0.25, size)
@@ -150,6 +184,9 @@ def penalty(target, location, board, size):
 
 
 def wall_between_points(first_point, second_point, board):
+    """
+    checks if there are walls between two points on the board.
+    """
     horizontal_dist = abs(first_point[1] - second_point[1])
     vertical_dist = abs(first_point[0] - second_point[0])
     min_horizontal = min(first_point[1], second_point[1])
@@ -166,6 +203,9 @@ def wall_between_points(first_point, second_point, board):
 
 
 def get_mask_reward(dist_from_mask_1, dist_from_mask_2, state, closest_mask_location):
+    """
+    a heuristic function, used by the evaluation function to get a reward for states with a mask close to them.
+    """
     mask_reward = 1
     dist_from_closest_mask = min([dist_from_mask_1, dist_from_mask_2])
     if closest_mask_location is not None and not wall_between_points(state.get_location(), closest_mask_location,
@@ -180,6 +220,10 @@ def get_mask_reward(dist_from_mask_1, dist_from_mask_2, state, closest_mask_loca
 
 
 def get_corona_penalty(current_game_state, board):
+    """
+     a heuristic function, used by the evaluation function to get a penalty for states that a corona virus is
+     close to the player.
+    """
     penalty = 1
     coronas = current_game_state.get_coronas()
     distance_lst = [manhattan_distance(corona, current_game_state.get_location())
@@ -196,6 +240,9 @@ def get_corona_penalty(current_game_state, board):
 
 
 def pitagoras(xy1, xy2):
+    """
+    calculates the pitagorean distance between two points on the board.
+    """
     return math.sqrt((xy1[0] - xy2[0]) * (xy1[0] - xy2[0]) + (xy1[1] - xy2[1]) * (xy1[1] - xy2[1]))
 
 
@@ -205,6 +252,9 @@ def manhattan_distance(xy1, xy2):
 
 
 class Node():
+    """
+    a class that represents a node in the game tree.
+    """
     def __init__(self, state, player, parent):
         self.counter = 0
         self.wins = 0
@@ -222,6 +272,9 @@ class Node():
 
 
 class MonteCarloTreeSearchAgent(Agent):
+    """
+    an MCST agent to solve the game.
+    """
 
     def __init__(self, max_simulations):
         super().__init__()
@@ -231,6 +284,9 @@ class MonteCarloTreeSearchAgent(Agent):
         self.num_coronas = 0
 
     def get_action(self, game_state):
+        """
+        gets an action for a given state.
+        """
         self.children = []
         self.children_to_explore = []
         self.num_simulations = 0
@@ -248,6 +304,9 @@ class MonteCarloTreeSearchAgent(Agent):
         return best[1]
 
     def monte_carlo_tree_search(self, state):
+        """
+        the implementation of MCST algorithm.
+        """
         leafs = []
         cur_state = state
         board_state = cur_state.state
@@ -303,6 +362,9 @@ class MonteCarloTreeSearchAgent(Agent):
             return lst
 
     def back_propagate(self, node, result, cause=None):
+        """
+        the back propagation part of the algorithm, that updates the game tree upwards.
+        """
         while node != None:
             if result == 1 and node.player == 0:
                 node.wins += 50
@@ -315,6 +377,9 @@ class MonteCarloTreeSearchAgent(Agent):
             node = node.parent
 
     def run_simulation(self, state, num_of_moves):
+        """
+        runs a simulation for MCST state.
+        """
         board_state = state.state
         if state.player == 0:
             for i in range(num_of_moves):
@@ -344,6 +409,9 @@ class MonteCarloTreeSearchAgent(Agent):
             return (1, None)
 
     def best_child(self):
+        """
+        gets the best child state of the current state in the game.
+        """
         flag = True
         for child in range(len(self.children) - 1):
             if calculate_score(self.children[child][0]) != calculate_score(self.children[child + 1][0]):
@@ -362,6 +430,9 @@ class MonteCarloTreeSearchAgent(Agent):
 
 
 def closest_target(targets, location, board):
+    """
+    finds the closest semi target to the player on the board.
+    """
     min = None
     closest_target = None
     for target in targets:
@@ -411,6 +482,9 @@ def closest_target(targets, location, board):
 
 
 def calculate_score(state):
+    """
+    calculates the current score of the player.
+    """
     if state.simulations_counter == 0:
         return math.inf
     score = -(state.wins / state.simulations_counter) + \
@@ -419,6 +493,9 @@ def calculate_score(state):
 
 
 def find_masks(board, masks):
+    """
+    finds the mask locations on the board.
+    """
     lst = []
     for mask in masks:
         if board[mask[0]][mask[1]] == 'm':

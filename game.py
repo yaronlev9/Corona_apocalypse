@@ -66,17 +66,27 @@ BOARD_4 = [
 CORONA_4 = [(3, 0), [], [(1, 2)], 4, 4, (0, 3), BOARD_4]
 CORONA_8 = [(7, 0), [(7, 5)], [(1, 1), (7, 3)], 8, 8, (0, 7), BOARD_8]
 CORONA_12 = [(11, 0), [(5, 0), (11, 8)], [(3, 3), (8, 2), (2, 11)], 12, 12, (0, 11), BOARD_12]
-CORONA_16 = [(12, 0), [(7, 15), (14, 7)], [(0, 8), (5, 10), (12, 7)], 16, 16, (0, 15), BOARD_16]
+CORONA_16 = [(15, 0), [(13, 11), (6, 4)], [(11, 10), (10, 2), (7, 7)], 16, 16, (0, 15), BOARD_16]
 
 
 class Game(object):
+    """
+    A game class, that holds all the attributes and methods of a game.
+    """
+
     def __init__(self, agent, display=None):
+        """
+        constructs a new Game object.
+        """
         self.agent = agent
         self.display = display
         self._state = None
         self._should_quit = False
 
     def run(self, initial_state, max_time=None):
+        """
+        runs one game.
+        """
         if self.display:
             self.display.root.update()
         else:
@@ -85,10 +95,10 @@ class Game(object):
         self._state = initial_state
         return self._game_loop(initial_state, max_time)
 
-    def quit(self):
-        self._should_quit = True
-
     def _game_loop(self, initial_state, max_time):
+        """
+        the loop that runs a single game.
+        """
         start = time.time()
         while not self._state.get_done() and not self._should_quit:
             action = self.agent.get_action(self._state)

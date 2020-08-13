@@ -13,6 +13,9 @@ MASK = 'm'
 
 
 class Display:
+    """
+    the GUI display of a corona apocalypse game.
+    """
 
     def __init__(self, initial_board):
         self.root = tk.Tk()
@@ -50,6 +53,9 @@ class Display:
         self.make_players(initial_board)
 
     def make_players(self, initial_board):
+        """
+        makes the labels for all the players on the board.
+        """
         self.make_label("player", initial_board.get_location(), self.player_img)
         counter = 1
         for corona in initial_board.get_coronas():
@@ -58,11 +64,17 @@ class Display:
             counter += 1
 
     def make_label(self, string, location, image):
+        """
+        sets a label to be on a given location on the board, with the given image.
+        """
         label = tk.Label(self.root, image=image)
         label.grid(row=location[0], column=location[1])
         self.locations_dict[string] = label
 
     def change_pos(self, string, location):
+        """
+        changes the position of a label.
+        """
         for mask in self.masks_labels.keys():
             if self.masks_labels[mask] != None and \
                     string == "player" and mask[0] == location[0] and mask[1] == location[1]:
@@ -81,4 +93,7 @@ class Display:
             counter += 1
 
     def destroy(self):
+        """
+        destroy the tkinter object.
+        """
         self.root.destroy()

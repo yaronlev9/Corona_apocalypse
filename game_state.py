@@ -18,6 +18,9 @@ TARGET = 'W'
 
 
 class GameState(object):
+    """
+    a class that holds all the attributes of a state in the game.
+    """
     def __init__(self, target, mask_locations, coronas, width, height, location, board=None, mask=False,
                  first_mask=True):
         self.__width = width
@@ -35,6 +38,9 @@ class GameState(object):
         self.__first_mask = first_mask
 
     def create_board(self, draft_board):
+        """
+        creates a new boards matrix, with given attributes from the constructor.
+        """
         board = draft_board
         counter = 1
         board[self.__location[0]][self.__location[1]] = '0'
@@ -50,6 +56,9 @@ class GameState(object):
         return board
 
     def _is_right_legal_action(self, location, player):
+        """
+        checks if a move to the right is legal considering the board state for a given player.
+        """
         if location[1] >= self.__width:
             return False
         if player == 0:
@@ -75,6 +84,9 @@ class GameState(object):
                self.__board[location[0]][location[1]] == 't'
 
     def _is_left_legal_action(self, location, player):
+        """
+        checks if a move to the left is legal considering the board state for a given player.
+        """
         if location[1] < 0:
             return False
         if player == 0:
@@ -100,6 +112,9 @@ class GameState(object):
                self.__board[location[0]][location[1]] == 't'
 
     def _is_up_legal_action(self, location, player):
+        """
+        checks if up move is legal considering the board state for a given player.
+        """
         if location[0] < 0:
             return False
         if player == 0:
@@ -125,6 +140,9 @@ class GameState(object):
                self.__board[location[0]][location[1]] == 't'
 
     def _is_down_legal_action(self, location, player):
+        """
+        checks if down move is legal considering the board state for a given player.
+        """
         if location[0] >= self.__height:
             return False
         if player == 0:
@@ -150,6 +168,9 @@ class GameState(object):
                self.__board[location[0]][location[1]] == 't'
 
     def get_legal_actions(self, player):
+        """
+        gets all of the legal actions for a given player.
+        """
         legal_actions = []
         if player == 0:
             location = self.__location
@@ -168,6 +189,9 @@ class GameState(object):
         return legal_actions
 
     def apply_action(self, action, player):
+        """
+        applies a given action on the game board, for a given player.
+        """
         if action not in self.get_legal_actions(player):
             return
         if player == 0:
@@ -219,6 +243,9 @@ class GameState(object):
             self.dict_of_moves[key] = False
 
     def generate_successor(self, player, action):
+        """
+        generates a successor for a game state with a given action.
+        """
         successor = GameState(target=self.__target,
                               mask_locations=deepcopy(self.__mask_locations),
                               coronas=deepcopy(self.__coronas),
@@ -232,48 +259,93 @@ class GameState(object):
         return successor
 
     def __str__(self):
+        """
+        used to print a board.
+        """
         for i in range(self.__height):
             print(self.__board[i])
         return ''
 
     def get_board(self):
+        """
+        gets the current board.
+        """
         return self.__board
 
     def get_target(self):
+        """
+        gets the location of the target.
+        """
         return self.__target
 
     def get_location(self):
+        """
+        gets the current location of the player.
+        """
         return self.__location
 
     def get_mask_status(self):
+        """
+        returns true iff the player has a mask on.
+        """
         return self.__mask
 
     def get_mask_locations(self):
+        """
+        gets the list of all the mask locations on the board.
+        """
         return self.__mask_locations
 
     def get_done(self):
+        """
+        returns true iff the game has got to an end.
+        """
         return self.__done
 
     def get_score(self):
+        """
+        gets the score of the player.
+        """
         return self.__score
 
     def get_win(self):
+        """
+        returns true iff the player has won.
+        """
         return self.__win
 
     def get_first_mask(self):
+        """
+        returns true iff the player did not take a mask yet.
+        """
         return self.__first_mask
 
     def get_width(self):
+        """
+        returns the width of the board.
+        """
         return self.__width
 
     def get_height(self):
+        """
+        returns the height of the board.
+        """
         return self.__height
 
     def get_coronas(self):
+        """
+        gets the list of corona locations.
+        """
         return self.__coronas
 
     def set_first_mask(self, value):
+        """
+        sets the value of the first_mask field to the given value.
+        """
         self.__first_mask = value
 
     def remove_mask_location(self, location):
+        """
+        removes a given location from the mask locations list.
+        """
         self.__mask_locations.remove(location)
